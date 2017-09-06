@@ -1,0 +1,3 @@
+GameServer-MJ 游戏服务器
+SoundChatServer 语音服务器
+weipaiManage 后台服务器
