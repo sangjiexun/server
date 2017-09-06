@@ -77,7 +77,7 @@ public class GameSession implements GameObj {
 			//system.out.println("session == "+session+" session.isConnected ==  "+session.isConnected()+" session.isClosing =  "+session.isClosing());
 			return null;
 		}
-		System.out.println("   wxd>>> really send " + msg.toString());
+		System.out.println("   wxd>>> realsend " + msg.toString());
 		return session.write(msg);
 	}
 
