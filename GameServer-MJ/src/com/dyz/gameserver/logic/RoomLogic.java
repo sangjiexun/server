@@ -300,28 +300,6 @@ public class RoomLogic {
     			hasDissolve = true;
     			//先结算信息，里面同时调用了解散房间的信息
     			playCardsLogic.settlementData("2");
-    			/*json = new JSONObject();
-    			json.put("type", "3");
-    			//所有人都同意了解散房间
-    			AvatarVO avatarVO;
-    			GameSession gamesession;
-    			for (Avatar avat : playerList) {
-    				avatarVO = new AvatarVO();
-    				avatarVO.setAccount(avat.avatarVO.getAccount());
-    				avat.getSession().sendMsg(new DissolveRoomResponse(1, json.toString()));
-    				gamesession = avat.getSession();
-    				avat = new Avatar();
-    				avat.avatarVO = avatarVO;
-    				gamesession.setRole(avat);
-    				gamesession.setLogin(true);
-    				avat.setSession(gamesession);
-    				avat.avatarVO.setIsOnLine(true);
-    				GameServerContext.add_onLine_Character(avat);
-    			}
-    			playerList.clear();
-    			roomVO.getPlayerList().clear();
-    			RoomManager.getInstance().destroyRoom(roomVO);
-    			roomVO = null;*/
     		}
     	}
     }

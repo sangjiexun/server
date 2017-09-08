@@ -34,7 +34,6 @@ public class Avatar implements GameObj {
     //请求胡
     public boolean huQuest = false;
     
-    //当前玩家能否吃
     public boolean canHu = true;
     
     public boolean qiangHu = true;
