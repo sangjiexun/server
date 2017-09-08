@@ -369,8 +369,8 @@ public class RoomLogic {
      * @param avatar
      * @return
      */
-    public boolean gangCard(Avatar avatar,int cardPoint,int gangType){
-    	return playCardsLogic.gangCard( avatar, cardPoint,gangType);
+    public boolean gangCard(Avatar avatar,int cardPoint){
+    	return playCardsLogic.gangCard( avatar, cardPoint);
     }
     /**
      * 胡牌
@@ -462,7 +462,7 @@ public class RoomLogic {
 	        	avatar = playerList.get(i);
 	        	avatar.avatarVO.setIsReady(false);//重置是否准备状态 10-11新增
 	        	avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
-	            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.avatarVO.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
+	            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
 	            //修改玩家是否玩一局游戏的状态
 	            account = AccountService.getInstance().selectByPrimaryKey(avatar.avatarVO.getAccount().getId());
 	            if(account.getIsGame().equals("0")){

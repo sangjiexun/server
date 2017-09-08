@@ -350,82 +350,30 @@ public class Avatar implements GameObj {
      * @return
      */
     public boolean checkChi(int cardIndex){
+    	if (cardIndex < 10000) //绝对true;
+    		return false;
+    	
     	boolean flag = false;
-    	//只有长沙麻将有吃的打法
     	//system.out.println("判断吃否可以吃牌-----cardIndex:"+cardIndex);
     	/**
     	 * 这里检测吃的时候需要踢出掉碰 杠了的牌****
     	 */
     	int []  cardList = avatarVO.getPaiArray()[0];
-    	if(cardIndex>=0  && cardIndex <=8){
-    		if(cardIndex == 0 && cardList[1] >=1 && cardList[2] >=1 ){
-    			flag = true;
-    		}
-    		else if(cardIndex == 1 && ((cardList[0] >=1 && cardList[2] >=1) 
-    				|| (cardList[3] >=1 && cardList[2] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex ==8 && cardList[7] >=1 && cardList[6] >=1){
-    			flag = true;
-    		}
-    		else if(cardIndex ==7 && ((cardList[8] >=1 && cardList[6] >=1)
-    				|| (cardList[5] >=1 && cardList[6] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex >=11 && cardIndex <= 15){
-    		  if((cardList[cardIndex-1] >=1 && cardList[cardIndex+1] >=1)
-    				|| (cardList[cardIndex-1] >=1 && cardList[cardIndex-2] >=1) 
-    				|| (cardList[cardIndex+1] >=1 && cardList[cardIndex+2] >=1)){
-    			    flag = true;
-    		  }
-    		}
-    	}
-    	else if((cardIndex>=9 && cardIndex <=17)){
-    		if(cardIndex == 9 && cardList[10] >=1 && cardList[11] >=1 ){
-    			flag = true;
-    		}
-    		else if(cardIndex == 10 && ((cardList[9] >=1 && cardList[11] >=1) 
-    				|| (cardList[11] >=1 && cardList[12] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex ==17 && cardList[16] >=1 && cardList[15] >=1){
-    			flag = true;
-    		}
-    		else if(cardIndex ==16 && ((cardList[15] >=1 && cardList[17] >=1)
-    				|| (cardList[14] >=1 && cardList[15] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex >=11 && cardIndex <= 15){
-    		  if((cardList[cardIndex-1] >=1 && cardList[cardIndex+1] >=1)
-    				|| (cardList[cardIndex-1] >=1 && cardList[cardIndex-2] >=1) 
-    				|| (cardList[cardIndex+1] >=1 && cardList[cardIndex+2] >=1)){
-    			flag = true;
-    		  }
-    		}
-    	}
-    	else if(cardIndex>=18 && cardIndex <=26){
-    		if(cardIndex == 18 && cardList[19] >=1 && cardList[20] >=1 ){
-    			flag = true;
-    		}
-    		else if(cardIndex == 19 && ((cardList[18] >=1 && cardList[20] >=1) 
-    				|| (cardList[20] >=1 && cardList[21] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex ==26 && cardList[25] >=1 && cardList[24] >=1){
-    			flag = true;
-    		}
-    		else if(cardIndex ==25 && ((cardList[24] >=1 && cardList[26] >=1)
-    				|| (cardList[23] >=1 && cardList[24] >=1))){
-    			flag = true;
-    		}
-    		else if(cardIndex >=20 && cardIndex <= 24){
-	    		 if((cardList[cardIndex-1] >=1 && cardList[cardIndex+1] >=1)
-	    			|| (cardList[cardIndex-1] >=1 && cardList[cardIndex-2] >=1) 
-	    			|| (cardList[cardIndex+1] >=1 && cardList[cardIndex+2] >=1)){
-	    			 flag = true;
-    		  } 
-    		}
-    	}
+    	if((cardIndex % 9 == 0) && (cardList[cardIndex + 1] >= 1) && (cardList[cardIndex + 2] >= 1)){
+    		flag = true;
+    	} else if(cardIndex % 9 == 1 && ((cardList[cardIndex - 1] >=1 && cardList[cardIndex + 1] >=1) 
+				|| (cardList[cardIndex + 1] >=1 && cardList[cardIndex + 2] >=1))){
+			flag = true;
+		} else if(cardIndex % 9 == 8 && cardList[cardIndex - 1] >=1 && cardList[cardIndex - 2] >=1){
+			flag = true;
+		} else if(cardIndex % 9 == 7 && ((cardList[cardIndex + 1] >=1 && cardList[cardIndex - 1] >=1)
+				|| (cardList[cardIndex - 1] >=1 && cardList[cardIndex - 2] >=1))){
+			flag = true;
+		} else if((cardList[cardIndex - 1] >= 1 && cardList[cardIndex + 1] >= 1)
+				|| (cardList[cardIndex - 1] >= 1 && cardList[cardIndex - 2] >= 1) 
+				|| (cardList[cardIndex + 1] >= 1 && cardList[cardIndex + 2] >= 1)){
+			flag = true;
+		}
         return flag;
     }
 
@@ -437,17 +385,8 @@ public class Avatar implements GameObj {
     public boolean putCardInList(int cardIndex){
         if(avatarVO.getPaiArray()[0][cardIndex]<4) {
             avatarVO.getPaiArray()[0][cardIndex]++;
-           return true;
-        }else{
-        	//再没检测出为什么牌组里面已经有4张牌的错误消息前暂且注释掉
-            //System.out.println("Error : putCardInList --> 牌数组里已经有4张牌");
-            //try {  
-                //session.sendMsg(new ErrorResponse(ErrorCode.Error_000008));
-           // } catch (IOException e) {
-            //    e.printStackTrace();
-           // }
-            return true;
         }
+        return true;
     }
 
     /**
