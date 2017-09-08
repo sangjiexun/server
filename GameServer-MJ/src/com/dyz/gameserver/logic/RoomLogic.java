@@ -370,7 +370,7 @@ public class RoomLogic {
      * @return
      */
     public boolean gangCard(Avatar avatar,int cardPoint){
-    	return playCardsLogic.gangCard( avatar, cardPoint);
+    	return playCardsLogic.gangCard(avatar, cardPoint);
     }
     /**
      * 胡牌

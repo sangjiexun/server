@@ -3,6 +3,7 @@ package com.dyz.gameserver;
 import com.dyz.gameserver.commons.session.GameSession;
 import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.gameserver.pojo.CardVO;
+import com.dyz.gameserver.pojo.HuReturnObjectVO;
 import com.dyz.gameserver.pojo.RoomVO;
 import com.dyz.gameserver.sprite.Character;
 import com.dyz.gameserver.sprite.base.GameObj;
@@ -238,24 +239,8 @@ public class Avatar implements GameObj {
     	boolean flag = false;
     	gangIndex.clear();//每次出牌就先清除缓存里面的可以杠的牌下标
         if(avatarVO.getPaiArray()[0][cardIndex] == 3 && avatarVO.getPaiArray()[1][cardIndex] == 0){
-        	//if(resultRelation.get(1) ==null){
-        		gangIndex.add(cardIndex);
-        		flag = true;
-        	/*}else{
-        		//
-        		String strs [] = resultRelation.get(1).split(",");
-        		for (int i = 0; i < strs.length; i++) {
-        			if(strs[i].equals(cardIndex+"")){
-						flag  =  false;
-						gangIndex.clear();
-						i = strs.length;
-					}
-					else{
-						gangIndex.add(cardIndex);
-						flag  =  true;
-					}
-				}
-        	}*/
+    		gangIndex.add(cardIndex);
+    		flag = true;
         }
         return flag;
     }
@@ -270,78 +255,14 @@ public class Avatar implements GameObj {
     	gangIndex.clear();//先清除缓存里面的可以杠的牌下标
     	//剔除掉当前以前吃，碰，杠的牌组 再进行比较
     	boolean flag = false;
-    	if(!roomVO.isAddWordCard()){
-    		//划水麻将没有风牌  就27
-    		for (int i= 0 ; i < 27 ; i++) {
-    			if (avatarVO.getPaiArray()[0][i] == 4 && avatarVO.getPaiArray()[1][i] != 2) {
-    				//先判断所有4个的牌组中是否有未杠过的
-    				gangIndex.add(i);
-    				flag = true;
-    				break;//多个杠的情况下默认杠下标最小的个牌
-    				/*if(resultRelation.get(2) == null ){
-    					gangIndex.add(i);
-    					flag =  true;
-    					i = 100;
-    				}
-    				else if(resultRelation.get(2) != null ){
-    					String strs [] = resultRelation.get(2).split(",");
-    					for (int j = 0; j < strs.length; j++) {
-    						if(strs[j].equals(i+"")){
-    							flag =  false;
-    							gangIndex.clear();
-    							j = 100;
-    							i = 100;
-    						}
-    						else{
-    							gangIndex.add(i);
-    							flag =  true;
-    						}
-    					}
-    					for (int j = 0; j < strs.length; j++) {
-    						if(!strs[j].equals(i+"")){
-    							gangIndex.add(i);
-    						}
-    					}
-    				}*/
-    			}
-    		}
-    	}
-    	else{
-    		//划水麻将有风牌  就 34
-    		for (int i= 0 ; i < 34 ; i++) {
-    			if (avatarVO.getPaiArray()[0][i] == 4 && avatarVO.getPaiArray()[1][i] != 2) {
-    				//先判断所有4个的牌组中是否有未杠过的
-    				gangIndex.add(i);
-    				flag = true;
-    				break;//多个杠的情况下默认杠下标最小的个牌
-    				/*if(resultRelation.get(2) == null ){
-    					gangIndex.add(i);
-    					flag =  true;
-    					i = 100;//多个杠的情况下默认杠下标最小的个牌
-    				}
-    				else if(resultRelation.get(2) != null ){
-    					String strs [] = resultRelation.get(2).split(",");
-    					for (int j = 0; j < strs.length; j++) {
-    						if(strs[j].equals(i+"")){
-    							flag =  false;
-    							gangIndex.clear();
-    							j = 100;
-    							i = 100;
-    						}
-    						else{
-    							gangIndex.add(i);
-    							flag =  true;
-    						}
-    					}
-    					for (int j = 0; j < strs.length; j++) {
-    						if(!strs[j].equals(i+"")){
-    							gangIndex.add(i);
-    						}
-    					}
-    				}*/
-    			}
-    		}
-    	}
+		int cardCnt = roomVO.isAddWordCard()?34:27;
+		for (int i = 0; i < cardCnt; i++) {
+			if (avatarVO.getPaiArray()[0][i] == 4 && avatarVO.getPaiArray()[1][i] != 2) {
+				gangIndex.add(i);
+				flag = true;
+				break;
+			}
+		}
         return flag;
     }
     /**
@@ -355,9 +276,8 @@ public class Avatar implements GameObj {
     	
     	boolean flag = false;
     	//system.out.println("判断吃否可以吃牌-----cardIndex:"+cardIndex);
-    	/**
-    	 * 这里检测吃的时候需要踢出掉碰 杠了的牌****
-    	 */
+    	
+    	//TODO 这里检测吃的时候需要踢出掉碰 杠了的牌
     	int []  cardList = avatarVO.getPaiArray()[0];
     	if((cardIndex % 9 == 0) && (cardList[cardIndex + 1] >= 1) && (cardList[cardIndex + 2] >= 1)){
     		flag = true;
@@ -405,14 +325,7 @@ public class Avatar implements GameObj {
     public void pullCardFormList(int cardIndex){
         if(avatarVO.getPaiArray()[0][cardIndex]>0) {
             avatarVO.getPaiArray()[0][cardIndex]--;
-        }else{/*
-            try {
-                session.sendMsg(new ErrorResponse(ErrorCode.Error_000007));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Error : pullCardFormList --> 牌数组里没有这张牌");
-        */}
+        }
     }
 
     /**
@@ -454,6 +367,11 @@ public class Avatar implements GameObj {
      */
     public int[] getTestPaiArray(){
         return new int[]{0, 2, 2, 2, 4, 1, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    }
+    
+    public HuReturnObjectVO getHuVO()
+    {
+        return avatarVO.getHuReturnObjectVO();
     }
 
 }
