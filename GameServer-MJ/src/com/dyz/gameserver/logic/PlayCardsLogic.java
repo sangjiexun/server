@@ -1819,7 +1819,7 @@ public class PlayCardsLogic {
 			}
 		}
 		
-		boolean flag = normalHuPai.checkGDHu(paiList.clone());
+		boolean flag = normalHuPai.checkBZHu(paiList.clone());
 		
 		if(flag)
 			avatar.avatarVO.setHuType(1);
