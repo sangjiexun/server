@@ -142,36 +142,17 @@ public class RoomLogic {
      * @throws IOException 
      */
     public void checkCanBeStartGame() throws IOException{
-    	//system.out.println("检测是否可以开始游戏");
-    	if(playerList.size() == 4){
-    		//房间里面4个人且都准备好了则开始游戏
+    	if(playerList.size() == 4){ //房间里面4个人且都准备好了则开始游戏
     		boolean flag = true;
     		for (Avatar avatar : playerList) {
-    			if(!avatar.avatarVO.getIsReady()){
-    				//还有人没有准备
+    			if(!avatar.avatarVO.getIsReady()){ //还有人没有准备
     				flag = false;
     				break;
     			}
 			}
-    		/*for(int i=0;i<playerList.size();i++){
-    			if(!playerList.get(i).avatarVO.getIsReady()){
-    				//还有人没有准备
-    				flag = false;
-    				break;
-    			}
-    		}*/
-    		if(flag){
-    		/*	if(count <= 0){
-    				//房间次数已经为0
-    				for (Avatar avatar : playerList) {
-    					avatar.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000010));
-    				}
-    			}else{*/
-    				isBegin = true;
-    				//所有人都准备好了
-    				//system.out.println("所有人都准备好了");
-    				startGameRound();
-    			//}
+    		if(flag) {
+				isBegin = true;
+				startGameRound();
     		}
     	}
     }
@@ -181,7 +162,6 @@ public class RoomLogic {
      * @param avatar
      */
     public void exitRoom(Avatar avatar){
-    	
         JSONObject json = new JSONObject();
 //		accountName:”名字”//退出房间玩家的名字(为空则表示是通知的自己)
 //		status_code:”0”//”0”退出成功，”1” 退出失败
@@ -191,40 +171,14 @@ public class RoomLogic {
         json.put("status_code", "0");
         json.put("uuid", avatar.getUuId());
         
-        
         if(avatar.avatarVO.isMain()){
         	//群主退出房间就是解散房间
         	json.put("type", "1");
         	exitRoomDetail(json);
-        }
-        else{
+        } else {
         	json.put("type", "0");
       	    //退出房间。通知房间里面的其他玩家
         	exitRoomDetail(avatar, json);
-        	
-        	/*for (int i= 0 ; i < playerList.size(); i++) {
-        		//通知房间里面的其他玩家
-        		playerList.get(i).getSession().sendMsg(new OutRoomResponse(1, json.toString()));
-        	}*/
-//        	avatar.avatarVO.setRoomId(0);
-//        	avatar.setRoomVO(new RoomVO());
-//        	playerList.remove(avatar);
-//        	roomVO.getPlayerList().remove(avatar.avatarVO);
-        	//如果该房间里面的人数只有一个人且不是房主时，解散房间（不可能出现这样的情况）
-        	/*if(playerList.size() == 1 && !playerList.get(0).avatarVO.isMain() ){
-	        	  json.put("type", "1");
-	          	  for (int i= 0 ; i < playerList.size(); i++) {
-	          			  playerList.get(i).getSession().sendMsg(new OutRoomResponse(1, json.toString()));
-	          			  roomVO.getPlayerList().remove(playerList.get(i).avatarVO);
-	          			  playerList.get(i).setRoomVO(new RoomVO());
-	          			  playerList.get(i).avatarVO.setRoomId(0);
-	        		}
-	          	  //销毁房间
-	          	  RoomManager.getInstance().destroyRoom(roomVO);
-	        	  playerList.clear();
-	        	  roomVO.setRoomId(0);
-	        	  roomVO = null;
-        	}*/
         }
     }
 
@@ -269,7 +223,6 @@ public class RoomLogic {
     		}
     		refuse = refuse+1;
     		if(refuse == 2){
-    			//system.out.println("拒绝解散房间");
     			//重置申请状态， 
     			refuse = 0;
     			dissolve = true;
@@ -377,12 +330,11 @@ public class RoomLogic {
     			return;
     		}*/
     	if(count == roomVO.getRoundNumber() || playCardsLogic.singleOver && count != roomVO.getRoundNumber()){//只有单局结束之后调用准备接口才有用10-11新增
-    		if(count <= 0){
-    			//房间次数已经为0
+    		if(count <= 0) { //房间次数已经为0
     			for (Avatar  ava: playerList) {
     				ava.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000010));
     			}
-    		}else{
+    		} else {
     			avatar.avatarVO.setIsReady(true);
     			int avatarIndex = playerList.indexOf(avatar);
     			//成功则返回
@@ -391,8 +343,7 @@ public class RoomLogic {
     			}
     			checkCanBeStartGame();
     		}
-    	}
-    	else{
+    	} else {
     		System.out.println("游戏还没有结束不能调用准备接口!");
     	}
     }
@@ -400,55 +351,41 @@ public class RoomLogic {
      * 开始一回合新的游戏
      */
     private void startGameRound(){
-       
-         if(count <= 0){
-            //房间次数用完了,通知所有玩家
-        	for (Avatar avatar : playerList) {
-        		try {
-					avatar.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000010) );
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-        	
-        }else{
-	        count--;
-	        roomVO.setCurrentRound(roomVO.getCurrentRound() +1);
-	        if((count +1) != roomVO.getRoundNumber()){
-	        	//说明不是第一局
-	        	Avatar avatar = playCardsLogic.bankerAvatar;
-	        	playCardsLogic = new PlayCardsLogic();
-	        	playCardsLogic.bankerAvatar = avatar;
-	        	//摸牌玩家索引初始值为庄家索引
-	        	playCardsLogic.setPickAvatarIndex(playerList.indexOf(avatar));
-	        }
-	        else{
-	        	playCardsLogic = new PlayCardsLogic();
-	        	playCardsLogic.setPickAvatarIndex(0);
-	        }
+        assert(count > 0);
+        count--;
+        roomVO.setCurrentRound(roomVO.getCurrentRound() +1);
+        if((count +1) != roomVO.getRoundNumber()){
+    	    //说明不是第一局
+    	    Avatar avatar = playCardsLogic.bankerAvatar;
+    	    playCardsLogic = new PlayCardsLogic();
+    	    playCardsLogic.bankerAvatar = avatar;
+    	    //摸牌玩家索引初始值为庄家索引
+    	    playCardsLogic.setPickAvatarIndex(playerList.indexOf(avatar));
+        } else {
+    	    playCardsLogic = new PlayCardsLogic();
+    	    playCardsLogic.setPickAvatarIndex(0);
+        }
 
-			playCardsLogic.setCreateRoomRoleId(createAvator.getUuId());
-	        playCardsLogic.setPlayerList(playerList);
-	        //playCardsLogic.initGui(roomVO);
-	        playCardsLogic.initCard(roomVO);
-	        
-	        
-	        Avatar avatar;
-	        Account account ;
-	        for(int i=0;i<playerList.size();i++){
-	        	//清除各种数据  1：本局胡牌时返回信息组成对象 ，
-	        	avatar = playerList.get(i);
-	        	avatar.avatarVO.setIsReady(false);//重置是否准备状态 10-11新增
-	        	avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
-	            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
-	            //修改玩家是否玩一局游戏的状态
-	            account = AccountService.getInstance().selectByPrimaryKey(avatar.avatarVO.getAccount().getId());
-	            if(account.getIsGame().equals("0")){
-	            	account.setIsGame("1");
-	            	AccountService.getInstance().updateByPrimaryKeySelective(account);
-	            	avatar.avatarVO.getAccount().setIsGame("1");
-	            }
-	        }
+        playCardsLogic.setCreateRoomRoleId(createAvator.getUuId());
+        playCardsLogic.setPlayerList(playerList);
+        //playCardsLogic.initGui(roomVO);
+        playCardsLogic.initCard(roomVO);
+       
+        Avatar avatar;
+        Account account ;
+        for(int i=0;i<playerList.size();i++){
+    	    //清除各种数据  1：本局胡牌时返回信息组成对象 ，
+    	    avatar = playerList.get(i);
+    	    avatar.avatarVO.setIsReady(false);//重置是否准备状态 10-11新增
+    	    avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
+            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
+            //修改玩家是否玩一局游戏的状态
+            account = AccountService.getInstance().selectByPrimaryKey(avatar.avatarVO.getAccount().getId());
+            if(account.getIsGame().equals("0")){
+        	    account.setIsGame("1");
+        	    AccountService.getInstance().updateByPrimaryKeySelective(account);
+        	    avatar.avatarVO.getAccount().setIsGame("1");
+            }
         }
     }
     
@@ -459,23 +396,7 @@ public class RoomLogic {
     public void shakeHandsMsg(Avatar avatar){
     	playCardsLogic.shakeHandsMsg(avatar);
     }
-   /* *//**
-     * 开始下一局前，玩家准备
-     * @param avatar
-     *//*
-    public void readyNext(Avatar avatar){
-    	playerList.get(playerList.indexOf(avatar)).avatarVO.setIsReady(true);
-    	int hasReady = 0;
-    	for (Avatar ava : playerList) {
-			if(ava.avatarVO.getIsReady()){
-				hasReady++;
-			}
-		}
-    	if(hasReady == 4){
-    		//如果四家人都准备好了
-    		startGameRound();
-    	}
-    }*/
+    
     /**
      * 断线重连，如果房间还未被解散的时候，则返回整个房间信息
      * @param avatar

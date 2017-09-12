@@ -82,84 +82,62 @@ public class HuPaiType {
 		 }else if(roomType == 4){
 			 //广东麻将
 			 return guangDong(avatarShu , avatar , cardIndex, playerList, mas, count, bankerAvatar);
+		 }else if(roomType == 5){
+			 //广东麻将
+			 return guangDong(avatarShu , avatar , cardIndex, playerList, mas, count, bankerAvatar);
 		 }
 		 
 		 return new ArrayList<>();
 	}
 	
 	/**
-	 * 划水麻将
+	 * 广东麻将
 	 * @param avatarShu  输家
 	 * @param avatar  自己
 	 * @param cardIndex
 	 * @param playerList
 	 * @param huCount 是否是一炮多响
 	 */
-	private List<Integer> guangDong(Avatar avatarShu , Avatar avatar,  int cardIndex , 
-			List<Avatar> playerList , List<Integer> mas, int huCount, Avatar bankerAvatar){
-		String str;
-		int score = 0;
-		
-		map = new HashMap<Integer,Integer>();
+	private List<Integer> guangDong(Avatar avatarShu, Avatar avatar, int cardIndex, 
+			List<Avatar> playerList, List<Integer> mas, int huCount, Avatar bankerAvatar) {
 		sb = new StringBuffer();
 		int zmCount = 0;
-		List<Integer> maPoint = new ArrayList<Integer>();
 		validMa = new ArrayList<Integer>();
 		
 		//计算中码
 		if(mas != null){
-			int ma;
-			for (Integer cardPoint : mas) {
-				ma = returnMa(cardPoint);
-				maPoint.add(ma);
-				//system.out.println("处理过的码----"+cardPoint);
-				map.put(cardPoint, ma);
-			}
-			
-			//int selfIndex = 0;//胡家在数组中的位置 （0-3）//2016-8-3
 			int selfIndex = playerList.indexOf(avatar);
 			int bankerIndex = playerList.indexOf(bankerAvatar);
-			if(bankerIndex == selfIndex){ //庄家胡了牌
-				zmCount  = Collections.frequency(maPoint, 0);//胡牌者中码数
-				sb.append("0,");
-			}else if( (bankerIndex+1==selfIndex) || (bankerIndex+1-4==selfIndex)){ //庄家下家胡了牌
-				zmCount  = Collections.frequency(maPoint, 1);//胡牌者中码数
-				sb.append("1,");
-			}
-			else if( (bankerIndex+2==selfIndex) || (bankerIndex+2-4==selfIndex)){ //庄家下2家胡了牌
-				zmCount  = Collections.frequency(maPoint, 2);//胡牌者中码数
-				sb.append("2,");
-			}
-			else if( (bankerIndex+3==selfIndex) || (bankerIndex+3-4==selfIndex)){ //庄家下3家胡了牌
-				zmCount  = Collections.frequency(maPoint, 3);//胡牌者中码数
-				sb.append("3,");
-			}
-					
-			Set<Entry<Integer, Integer>>  set= map.entrySet();
-			for (Entry<Integer, Integer> entry : set) {
-				if(sb.toString().contains(entry.getValue()+"")){
-					validMa.add(entry.getKey());
-				}
-			}
-			System.out.println("有效码："+validMa);
 			
-		}		
-		
-		if(avatarShu.getUuId() == avatar.getUuId() ){
-			//自摸类型
+			int orderdiff = (selfIndex - bankerIndex + 4) % 4; //庄家 跟 胡牌者的位置差距。e.g. 1表示胡家在庄家下家。
+			sb.append(orderdiff + ",");
+			
+			for (Integer cardPoint : mas) {
+				if(orderdiff == returnMa(cardPoint)) {
+					zmCount += 1;
+					if(!validMa.contains(cardPoint)) {
+						validMa.add(cardPoint);
+					}
+				}
+			}
+			System.out.println("有效码：" + validMa);
+		}
+
+		String str;
+		int score = 0;
+		if(avatarShu.getUuId() == avatar.getUuId()) { //自摸类型
+			if(avatar.avatarVO.getHuType() == 1) { //小胡 2分
+				score = 2;
+			}
+			else if(avatar.avatarVO.getHuType() == 2) { //七小对 4分
+				score = 4;
+			}
+			if(mas != null){
+				score = score + 2 * zmCount;
+			}
+			
 			for (int i = 0; i < playerList.size(); i++) {
-				if(avatar.avatarVO.getHuType() == 1){
-					//小胡 2分
-					score = 2;
-				}
-				else if(avatar.avatarVO.getHuType() == 2){
-					//七小对 4分
-					score = 4;
-				}
-				if(mas != null){
-					score = score + 2*zmCount;
-				}
-				if(playerList.get(i).getUuId() == avatar.getUuId()){
+				if(playerList.get(i).getUuId() == avatar.getUuId()) {
 					if(avatar.avatarVO.getHuType() == 2){
 						str = "0:" + cardIndex + ":" + Rule.Hu_self_qixiaodui;
 					}else {
@@ -167,8 +145,7 @@ public class HuPaiType {
 					}
 					avatar.getHuVO().updateTotalInfo("hu", str);
 					avatar.getHuVO().updateGangAndHuInfos("1", score*3);
-				}
-				else{
+				} else{
 					if(avatar.avatarVO.getHuType() == 2){
 						str = "0:" + cardIndex + ":" + Rule.Hu_other_qixiaodui;
 					}else {
@@ -178,34 +155,26 @@ public class HuPaiType {
 					playerList.get(i).getHuVO().updateGangAndHuInfos("1", -1*score);
 				}
 			}
-		}
-		else{
+		} else {
 			//点炮   单响
-			if(avatar.avatarVO.getHuType() == 1){
-				//小胡 2分
+			if(avatar.avatarVO.getHuType() == 1) { //小胡 2分
 				score = 6;
 			}
-			else if(avatar.avatarVO.getHuType() == 2){
-				//七小对 4分
+			else if(avatar.avatarVO.getHuType() == 2) { //七小对 4分
 				score = 12;
 			}
 			if(mas != null){
-				score = score + 3*2*zmCount;				
+				score = score + 3 * 2 * zmCount;				
 			}
 			
 			if(huCount == 1){
 				str =avatarShu.getUuId()+":"+cardIndex+":"+Rule.Hu_d_self;  
-				//修改胡家自己的番数
 				avatar.getHuVO().updateTotalInfo("hu", str);				
 				avatar.getHuVO().updateGangAndHuInfos("2",1*score);
 				
-				
-				//修改点炮玩家的番
-				avatarShu.getHuVO().updateGangAndHuInfos("3",-1*score);
-				//存储hu的关系信息 胡玩家uuid：胡牌id：胡牌类型
 				str = avatar.getUuId()+":"+cardIndex+":"+Rule.Hu_d_other; 
-				//点炮信息放入放炮玩家信息中
 				avatarShu.getHuVO().updateTotalInfo("hu", str);
+				avatarShu.getHuVO().updateGangAndHuInfos("3",-1*score);
 				
 				//杠的分数全部由被抢杠胡的人出
 				for (Avatar ava :playerList) {
@@ -224,20 +193,14 @@ public class HuPaiType {
 				}
 			}
 			//广东麻将没有点炮多响？
-			else{
-				//点炮  多响  
+			else{ //点炮  多响  
 				str =avatarShu.getUuId()+":"+cardIndex+":"+Rule.Hu_d_self;  
-				//修改胡家自己的番数
 				avatar.getHuVO().updateTotalInfo("hu", str);
 				avatar.getHuVO().updateGangAndHuInfos("2",1*score);
 				
-				
-				//修改点炮玩家的番数
-				avatarShu.getHuVO().updateGangAndHuInfos("3",-1*score);				
-				//存储hu的关系信息 胡玩家uuid：胡牌id：胡牌类型
 				str = avatar.getUuId()+":"+cardIndex+":"+Rule.Hu_d_other; 
-				//点炮信息放入放炮玩家信息中
 				avatarShu.getHuVO().updateTotalInfo("hu", str);
+				avatarShu.getHuVO().updateGangAndHuInfos("3",-1*score);		
 				
 				//杠的分数全部由被抢杠胡的人出
 				for (Avatar ava :playerList) {
@@ -576,21 +539,15 @@ public class HuPaiType {
 	 * @return
 	 */
 	public static int returnMa(int cardPoint){
-			if(cardPoint  <= 8){// 万
-				return cardPoint%4;
-			}
-			else if(cardPoint <31 && cardPoint >= 27){ //东南西北
-				cardPoint = cardPoint-27;
-				return cardPoint;
-			}
-			else if(cardPoint >=31 ){ //中发白
-				cardPoint = cardPoint-31;
-				return cardPoint;
-			}
-			else { //其他普通牌，即条和筒
-				cardPoint = cardPoint-9;
-				return returnMa(cardPoint);
-			}
+		if (cardPoint >= 31) { //中发白
+			cardPoint = cardPoint - 31;
+			return cardPoint;
+		} else if(cardPoint >= 27) { //东南西北
+			cardPoint = cardPoint - 27;
+			return cardPoint;
+		} else {// 普通牌
+			return (cardPoint % 9) % 4;
+		}
 	}
 	
 	

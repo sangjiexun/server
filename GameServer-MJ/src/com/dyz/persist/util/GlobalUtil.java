@@ -39,4 +39,12 @@ public class GlobalUtil {
         }
         return result;
     }
+
+    public static String getIntListString(int[] intList) {
+		String result = "int string = ";
+		for (int i = 0; i < intList.length; i++) {
+			result += intList[i] + ", ";
+		}
+		return result;
+	}
 }

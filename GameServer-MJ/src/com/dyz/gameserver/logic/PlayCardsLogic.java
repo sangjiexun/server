@@ -1662,16 +1662,9 @@ public class PlayCardsLogic {
 		// 不需要移除掉碰，杠了的牌组，在判断是否胡的时候就应判断了
 		boolean flag = false;
 		
-		boolean tmpcheckQueYiMen = checkQueYiMen(paiList.clone());
-		System.out.println("   wxd>>>  check queyimen  " + tmpcheckQueYiMen);
-		if (!tmpcheckQueYiMen) // 缺一门
-		{
-			return false;
-		}
-		// 可以抢杠胡（只有可抢杠胡的时候才判断其他人有没有胡牌）
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小对
-			int isSeven = checkSevenDouble_gd(paiList.clone());
+			int isSeven = checkSevenDouble(paiList.clone(), roomVO.getGui()==0?-1:roomVO.getGuiPai());
 			if (isSeven == 0) {
 				// System.out.println("没有七小对");
 			} else {
@@ -1680,10 +1673,9 @@ public class PlayCardsLogic {
 			}
 		}
 		if (!flag) {
-			if (roomVO.getGui()>0) {
-				// 有癞子
+			if (roomVO.getGui()>0) {  // 有癞子
 				flag = Naizi_gd2.testHuPai(paiList.clone(), roomVO.getGuiPai());
-			} else { //无鬼
+			} else {
 				flag = normalHuPai.checkGDHu(paiList.clone());
 			}
 			
@@ -1702,28 +1694,21 @@ public class PlayCardsLogic {
 	 */
 	public boolean checkHuZZhuan(Avatar avatar) {
 		int[][] paiList = avatar.getPaiArray();
-		// 不需要移除掉碰，杠了的牌组，在判断是否胡的时候就应判断了
-		// paiList = cleanGangAndPeng(paiList,avatar);
 		boolean flag = false;
-		// if(roomVO.getZiMo() == 2 || roomVO.getZiMo() == 0){
-		// 可以抢杠胡（只有可抢杠胡的时候才判断其他人有没有胡牌）
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = checkSevenDouble(paiList.clone());
-			if (isSeven == 0) {
-				// System.out.println("没有七小对");
-			} else {
-				if (isSeven == 1) {
-					// System.out.println("七对");
-				} else {
-					// System.out.println("龙七对");
-				}
+			int isSeven = checkSevenDouble(paiList.clone(), roomVO.getHong()?31:-1);
+			if (isSeven != 0) {
+				//if (isSeven == 1) {
+				//	System.out.println("七对");
+				//} else {
+				//	System.out.println("龙七对");
+				//}
 				flag = true;
 			}
 		}
 		if (!flag) {
-			if (roomVO.getHong()) {
-				// 有癞子
+			if (roomVO.getHong()) {  // 有癞子
 				flag = Naizi.testHuiPai(paiList.clone());
 			} else {
 				flag = normalHuPai.checkZZHu(paiList.clone());
@@ -1743,15 +1728,13 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = checkSevenDouble(paiList.clone());
-			if (isSeven == 0) {
-				// system.out.println("没有七小对");
-			} else {
-				if (isSeven == 1) {
-					// system.out.println("七对");
-				} else {
-					// system.out.println("龙七对");
-				}
+			int isSeven = checkSevenDouble(paiList.clone(), -1);
+			if (isSeven != 0) {
+				//if (isSeven == 1) {
+				//	System.out.println("七对");
+				//} else {
+				//	System.out.println("龙七对");
+				//}
 				if (pickAvatarIndex == playerList.indexOf(avatar)) {
 					// 自摸七小队
 					avatar.huAvatarDetailInfo.add(currentCardPoint + ":" + 7);
@@ -1763,27 +1746,10 @@ public class PlayCardsLogic {
 				flag = true;
 			}
 		}
-		/*
-		 * if(!flag){
-		 *//**
-		 * 1111 、11 、11 、11、 11 、11 （这种也算胡） 1111、1111、11、11、11（这种也算对胡） 1111
-		 * 1111 1111 11(也算对胡）
-		 */
-		/*
-		 * //特殊算法 if(!flag){ int twoCard = 0; int fourCard = 0; //1111 、11 、11
-		 * 、11、 11 、11 for (int i = 0; i < paiList[0].length; i++) {
-		 * if(paiList[0][i] ==2){ twoCard++; } else if(paiList[0][i] ==4){
-		 * fourCard ++; } } if((twoCard == 5 && fourCard == 1) || (twoCard == 3
-		 * && fourCard == 2) || (twoCard == 1 && fourCard == 3)){
-		 * avatar.avatarVO.setHuType(1);//划水麻将小胡 System.out.println("特殊算法胡");
-		 * flag = true; } } }
-		 */
 		// 判断是否可以普通胡的时候，需要检测 风牌是否都是成对或成三
 		if (!flag) {
-			flag = normalHuPai.checkHSHu(paiList.clone(),
-					roomVO.isAddWordCard());
+			flag = normalHuPai.checkHSHu(paiList.clone(), roomVO.isAddWordCard());
 			if (flag) {
-				// system.out.println("普通胡");
 				avatar.avatarVO.setHuType(1);// 划水麻将小胡
 			}
 		}
@@ -1825,186 +1791,40 @@ public class PlayCardsLogic {
 			avatar.avatarVO.setHuType(1);
 		return flag;
 	}
-	
-	/**
-	 * 最后胡牌的检测胡牌的时候在牌组中提出条碰，杠的牌组再进行验证
-	 * 
-	 * @param paiList
-	 * @return
-	 */
-	public int[] cleanGangAndPeng(int[] paiList, Avatar avatar) {
-
-		String str;
-		String strs[];
-		int cardIndex;
-		if ((str = avatar.getResultRelation().get(1)) != null) {
-			// 踢出碰的牌组
-			strs = str.split(",");
-			for (String string : strs) {
-				cardIndex = Integer.parseInt(string.split(":")[1]);
-				if (paiList[cardIndex] >= 3) {
-					paiList[cardIndex] = paiList[cardIndex] - 3;
-				} else {
-					// system.out.println("出现碰了的牌不在手牌中的错误情况!");
-				}
-			}
-		}
-
-		if (avatar.getResultRelation().get(2) != null) {
-			// 踢出杠的牌组
-			// 踢出碰的牌组
-			strs = str.split(",");
-			for (String string : strs) {
-				cardIndex = Integer.parseInt(string.split(":")[1]);
-				if (paiList[cardIndex] == 4) {
-					paiList[cardIndex] = 0;
-				} else {
-					// system.out.println("出现碰了的牌不在手牌中的错误情况!");
-				}
-			}
-		}
-		return paiList;
-	}
-
-	/**
-	 * 
-	 * @param paiList
-	 * @return
-	 */
-	String getString(int[] paiList) {
-		String result = "int string = ";
-		for (int i = 0; i < paiList.length; i++) {
-			result += paiList[i];
-		}
-		return result;
-	}
 
 	/**
 	 * 检查是否七小对胡牌
 	 * 
 	 * @param paiList
+	 * @param laizi -1:无赖子，!-1:赖子的牌点数。
 	 * @return 0-没有胡牌。1-普通七小对，2-龙七对
 	 */
-	public int checkSevenDouble(int[][] paiList) {
+	public int checkSevenDouble(int[][] paiList, int laizi) {
+		int count = 0;               // 单牌个数
 		int result = 1;
-		if (roomVO.getHong()) {
-			// 红中麻将另算
-			int count = 0;// 单拍个数
-			for (int i = 0; i < paiList[0].length; i++) {
-				if (paiList[0][i] != 0 && i != 31) {
-					if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-						if (paiList[1][i] == 0) {
-							count++;
-						} else {
-							return 0;
-						}
-					} else {
-						if (paiList[1][i] != 0) {
-							return 0;
-						} else {
-							if (paiList[0][i] == 4) {
-								result = 2;
-							}
-						}
-					}
-				}
-			}
-			if (count != 0 && count != paiList[0][31]) {
+		for (int i = 0; i < paiList[0].length; i++) {
+			if(paiList[1][i] != 0) { //七小对必须门清。
 				return 0;
 			}
-		} else {
-			for (int i = 0; i < paiList[0].length; i++) {
-				if (paiList[0][i] != 0) {
-					if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-						return 0;
-					} else {
-						if (paiList[1][i] != 0) {
-							return 0;
-						} else {
-							if (paiList[0][i] == 4) {
-								result = 2;
-							}
-						}
-					}
+			
+			if (paiList[0][i] != 0 && i != laizi) {
+				if (paiList[0][i] != 2 && paiList[0][i] != 4) {
+					count++;
+				} else if (paiList[0][i] == 4) {
+					result = 2;
 				}
 			}
 		}
-		return result;
-	}
-
-	/**
-	 * 检查是否七小对胡牌_广东麻将
-	 * 
-	 * @param paiList
-	 * @return 0-没有胡牌。1-普通七小对，2-龙七对
-	 */
-	public int checkSevenDouble_gd(int[][] paiList) {
-		int result = 1;
-		if (roomVO.getGui()== 1) { 
-			// 白板做鬼
-			int count = 0;// 单拍个数
-			for (int i = 0; i < paiList[0].length; i++) {
-				if (paiList[0][i] != 0 && i != roomVO.getGuiPai()) {
-					if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-						if (paiList[1][i] == 0) {
-							count++;
-						} else {
-							return 0;
-						}
-					} else {
-						if (paiList[1][i] != 0) {
-							return 0;
-						} else {
-							if (paiList[0][i] == 4) {
-								result = 2;
-							}
-						}
-					}
-				}
+		
+		if(laizi == -1) {
+			if(count != 0) {
+				result = 0;
 			}
-			if (count != 0 && count != paiList[0][roomVO.getGuiPai()]) {
-				return 0;
-			}
-		} else if (roomVO.getGui()== 2) { 
-			//翻鬼
-			int count = 0;// 单拍个数
-			for (int i = 0; i < paiList[0].length; i++) {
-				if (paiList[0][i] != 0 && i != roomVO.getGuiPai()) {
-					if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-						if (paiList[1][i] == 0) {
-							count++;
-						} else {
-							return 0;
-						}
-					} else {
-						if (paiList[1][i] != 0) {
-							return 0;
-						} else {
-							if (paiList[0][i] == 4) {
-								result = 2;
-							}
-						}
-					}
-				}
-			}
-			if (count != 0 && count != paiList[0][roomVO.getGuiPai()]) {
-				return 0;
-			}
-		}else { //无鬼
-			for (int i = 0; i < paiList[0].length; i++) {
-				if (paiList[0][i] != 0) {
-					if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-						return 0;
-					} else {
-						if (paiList[1][i] != 0) {
-							return 0;
-						} else {
-							if (paiList[0][i] == 4) {
-								result = 2;
-							}
-						}
-					}
-				}
+		} else {
+			int diff = paiList[0][laizi] - count;
+			//if (diff < 0 || diff % 2 != 0) { //赖子张数不够 || 赖子凑不成对 （不知道赖子成对算不算七小对）
+			if(diff != 0) {
+				result = 0;
 			}
 		}
 		return result;
@@ -2012,17 +1832,13 @@ public class PlayCardsLogic {
 	
 	public boolean checkQueYiMen(int[][] paiList) { //缺一门
 		int flag = 0;
-		for (int i = 0; i < paiList[0].length; i++) {
-			if(i > 26){ //不查字牌
-				continue;
-			}
-			//System.out.println("   wxd>>>   per card  " + i + " : " + paiList[0][i] + "  ||  " + flag + " * " + (1 << (i / 9)));
+		for (int i = 0; i < 27; i++) { //不查字牌
 			if (paiList[0][i] != 0)
 			{
 				flag |= (1 << (i / 9));
 			}
 		}
-		System.out.println("   wxd>>>   check flag " + flag);
+		System.out.println("   wxd>>>   check queyimen flag " + flag);
 		return flag != 7;
 	}
 	
@@ -2034,7 +1850,6 @@ public class PlayCardsLogic {
 	 */
 	public void shakeHandsMsg(Avatar avatar) {
 		shakeHandsInfo.remove(avatar.getUuId());
-
 	}
 
 	/**
