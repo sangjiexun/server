@@ -1664,7 +1664,7 @@ public class PlayCardsLogic {
 		
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小对
-			int isSeven = checkSevenDouble(paiList.clone(), roomVO.getGui()==0?-1:roomVO.getGuiPai());
+			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getGui()==0?-1:roomVO.getGuiPai());
 			if (isSeven == 0) {
 				// System.out.println("没有七小对");
 			} else {
@@ -1697,7 +1697,7 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = checkSevenDouble(paiList.clone(), roomVO.getHong()?31:-1);
+			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getHong()?31:-1);
 			if (isSeven != 0) {
 				//if (isSeven == 1) {
 				//	System.out.println("七对");
@@ -1728,7 +1728,7 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = checkSevenDouble(paiList.clone(), -1);
+			int isSeven = HuPaiType.CheckSevenDouble(paiList, -1);
 			if (isSeven != 0) {
 				//if (isSeven == 1) {
 				//	System.out.println("七对");
@@ -1769,77 +1769,29 @@ public class PlayCardsLogic {
 			checkQiShouFu();
 		}
 		return false;
-
 	}
 
 	public boolean checkHuBoZhou(Avatar avatar) {
 		int[][] paiList = avatar.getPaiArray();
-
+		
 		System.out.println("   wxd>>>  check hu bozhou  " + roomVO.getQueYiMen());
 		if (roomVO.getQueYiMen()) { //缺一门
-			boolean tmpcheckQueYiMen = checkQueYiMen(paiList.clone());
-			System.out.println("   wxd>>>  check queyimen  " + tmpcheckQueYiMen);
+			boolean tmpcheckQueYiMen = HuPaiType.CheckQueYiMen(paiList);
 			if (!tmpcheckQueYiMen) // 缺一门
 			{
 				return false;
 			}
 		}
 		
+		if (roomVO.getSevenDouble()) { // 可七小对
+			int isSeven = HuPaiType.CheckSevenDouble(paiList, -1);
+			if (isSeven != 0) {
+				return true;
+			}
+		}
+		
 		boolean flag = normalHuPai.checkBZHu(paiList.clone());
-		
-		if(flag)
-			avatar.avatarVO.setHuType(1);
 		return flag;
-	}
-
-	/**
-	 * 检查是否七小对胡牌
-	 * 
-	 * @param paiList
-	 * @param laizi -1:无赖子，!-1:赖子的牌点数。
-	 * @return 0-没有胡牌。1-普通七小对，2-龙七对
-	 */
-	public int checkSevenDouble(int[][] paiList, int laizi) {
-		int count = 0;               // 单牌个数
-		int result = 1;
-		for (int i = 0; i < paiList[0].length; i++) {
-			if(paiList[1][i] != 0) { //七小对必须门清。
-				return 0;
-			}
-			
-			if (paiList[0][i] != 0 && i != laizi) {
-				if (paiList[0][i] != 2 && paiList[0][i] != 4) {
-					count++;
-				} else if (paiList[0][i] == 4) {
-					result = 2;
-				}
-			}
-		}
-		
-		if(laizi == -1) {
-			if(count != 0) {
-				result = 0;
-			}
-		} else {
-			int diff = paiList[0][laizi] - count;
-			//if (diff < 0 || diff % 2 != 0) { //赖子张数不够 || 赖子凑不成对 （不知道赖子成对算不算七小对）
-			if(diff != 0) {
-				result = 0;
-			}
-		}
-		return result;
-	}
-	
-	public boolean checkQueYiMen(int[][] paiList) { //缺一门
-		int flag = 0;
-		for (int i = 0; i < 27; i++) { //不查字牌
-			if (paiList[0][i] != 0)
-			{
-				flag |= (1 << (i / 9));
-			}
-		}
-		System.out.println("   wxd>>>   check queyimen flag " + flag);
-		return flag != 7;
 	}
 	
 	/**

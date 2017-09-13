@@ -8,7 +8,6 @@ import com.dyz.gameserver.logic.RoomLogic;
 import com.dyz.gameserver.msg.response.ErrorResponse;
 import com.dyz.gameserver.msg.response.login.BreakLineResponse;
 import com.dyz.gameserver.msg.response.login.OtherBackLoginResonse;
-import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.persist.util.TimeUitl;
 
 import java.io.IOException;
