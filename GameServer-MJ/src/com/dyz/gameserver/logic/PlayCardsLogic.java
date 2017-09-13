@@ -237,7 +237,7 @@ public class PlayCardsLogic {
 		}
 
 		int extraPai = 0;
-		if (roomVO.getRoomType() == 1 && roomVO.getHong()) { //红中麻将额外加红中。
+		if (roomVO.getRoomType() == 1 && roomVO.getGui() == 3) { //红中麻将额外加红中。
 			extraPai = 31;
 		} else if (roomVO.getRoomType() == 2 && roomVO.isAddWordCard()) {
 			extraPai = 100;
@@ -279,7 +279,7 @@ public class PlayCardsLogic {
 	 */
 	public void initGui(RoomVO value) {
 		if(value.getRoomType()==3){
-			if(value.getHong())
+			if(value.getGui() == 3)
 				perGui=31; //红中做鬼
 		}else if(value.getRoomType()==4){
 			if(value.getGui()==1)//白板做鬼
@@ -662,7 +662,7 @@ public class PlayCardsLogic {
 		}
 		System.out.println("   wxd>>>  start  play card  " + putOffCardPoint);
 		// 房间为可点炮。房间为可抢杠胡并且有癞子时才检测其他玩家有没胡的情况。
-		boolean canDianPao = (avatar.getRoomVO().getZiMo() == 0 && !avatar.getRoomVO().getHong() && avatar.getRoomVO().getRoomType()!=4);
+		boolean canDianPao = (avatar.getRoomVO().getZiMo() == 0 && avatar.getRoomVO().getGui() != 3 && avatar.getRoomVO().getRoomType()!=4);
 		canDianPao = true; //TODEL
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < playerList.size(); i++) {
@@ -865,7 +865,7 @@ public class PlayCardsLogic {
 						if (strs != null && strs.contains(cardPoint + "")) { //碰牌自摸明杠（划水麻将里面的过路杠）
 							// 抢杠提前退出
 							if ((avatar.getRoomVO().getRoomType() != 4 && avatar.getRoomVO().getZiMo() == 0 && checkQiangHu(avatar, cardPoint))
-									|| (avatar.getRoomVO().getRoomType() == 4 && avatar.getRoomVO().getGangHu() && checkQiangHu(avatar, cardPoint))
+									|| (avatar.getRoomVO().getRoomType() == 4 && avatar.getRoomVO().getZiMo() == 2 && checkQiangHu(avatar, cardPoint))
 									) {
 								// 如果是抢杠胡，则判断其他玩家有胡牌的情况，有则给予提示 //判断其他三家是否能抢杠胡。
 								// 如果抢胡了，则更新上家出牌的点数为 杠的牌
@@ -989,7 +989,7 @@ public class PlayCardsLogic {
 		int maCount = avatar.getRoomVO().getMa();
 		if (maCount >= 1 && !(huCount > 1 && !StringUtil.isEmpty(allMas))) { //需要抓码 && 防止多响的重复抓码
 			if (huCount == 1) { //单响 胡家抓码
-				if (roomVO.getHong() && avatar.getPaiArray()[0][31] == 0) { //当单响胡家手上没有红中，则多抓一个码
+				if (roomVO.getGui() == 3 && avatar.getPaiArray()[0][31] == 0) { //当单响胡家手上没有红中，则多抓一个码
 					maCount++;
 				}
 				sb.append(avatar.getUuId());
@@ -1041,7 +1041,7 @@ public class PlayCardsLogic {
 									.getHuType(playerList.get(curAvatarIndex),
 											avatar, roomVO.getRoomType(),
 											cardIndex, playerList, mas,
-											huCount, type, roomVO.getHong(), bankerAvatar);
+											huCount, type, roomVO.getGui() == 3, bankerAvatar);
 							for (Integer j : newValidMa) {
 								validMa.add(j);
 							}
@@ -1050,7 +1050,7 @@ public class PlayCardsLogic {
 									playerList.get(curAvatarIndex), avatar,
 									roomVO.getRoomType(), cardIndex,
 									playerList, mas, huCount, type,
-									roomVO.getHong(), bankerAvatar);
+									roomVO.getGui() == 3, bankerAvatar);
 						}
 						// 整个房间统计每一局游戏 杠，胡的总次数
 						roomVO.updateEndStatistics(avatar.getUuId() + "",
@@ -1078,14 +1078,14 @@ public class PlayCardsLogic {
 								.getHuType(playerList.get(curAvatarIndex),
 										avatar, roomVO.getRoomType(),
 										cardIndex, playerList, mas, huCount,
-										type, roomVO.getHong(), bankerAvatar);
+										type, roomVO.getGui() == 3, bankerAvatar);
 						for (Integer j : newValidMa) {
 							validMa.add(j);
 						}
 					} else {
 						validMa = HuPaiType.getInstance().getHuType(avatar,
 								avatar, roomVO.getRoomType(), cardIndex,
-								playerList, mas, huCount, "", roomVO.getHong(), bankerAvatar);
+								playerList, mas, huCount, "", roomVO.getGui() == 3, bankerAvatar);
 					}
 					roomVO.updateEndStatistics(avatar.getUuId() + "", "zimo", 1);
 					flag = true;
@@ -1697,7 +1697,7 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getHong()?31:-1);
+			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getGui() != 0?roomVO.getGuiPai():-1);
 			if (isSeven != 0) {
 				//if (isSeven == 1) {
 				//	System.out.println("七对");
@@ -1708,7 +1708,7 @@ public class PlayCardsLogic {
 			}
 		}
 		if (!flag) {
-			if (roomVO.getHong()) {  // 有癞子
+			if (roomVO.getGui() != 0) {  // 有癞子
 				flag = Naizi.testHuiPai(paiList.clone());
 			} else {
 				flag = normalHuPai.checkZZHu(paiList.clone());
@@ -1774,8 +1774,8 @@ public class PlayCardsLogic {
 	public boolean checkHuBoZhou(Avatar avatar) {
 		int[][] paiList = avatar.getPaiArray();
 		
-		System.out.println("   wxd>>>  check hu bozhou  " + roomVO.getQueYiMen());
-		if (roomVO.getQueYiMen()) { //缺一门
+		//System.out.println("   wxd>>>  check hu bozhou  " + roomVO.getQueYiMen());
+		if (true) {//roomVO.getQueYiMen()) { //缺一门 //TODO
 			boolean tmpcheckQueYiMen = HuPaiType.CheckQueYiMen(paiList);
 			if (!tmpcheckQueYiMen) // 缺一门
 			{

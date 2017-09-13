@@ -29,9 +29,9 @@ public class RoomInfoService {
 	     * @return
 	     */
 	    public int createRoomInfo(RoomVO roomVO){
-	    	//创建信息的同事创建其关联表
+	    	//创建信息的同时创建其关联表
 	        RoomInfo room = new RoomInfo();
-	        room.setIshong(roomVO.getHong()?"1":"0");
+	        room.setIshong(roomVO.getGui() == 3?"1":"0");
 	        room.setGametype(roomVO.getRoomType()+"");
 	        room.setMa(roomVO.getMa());
 	        room.setRoomid(roomVO.getRoomId());
@@ -45,21 +45,6 @@ public class RoomInfoService {
 	    	//创建RoomInfo表
 	        int index = roomInfoMap.insertSelective(room);
 	        roomVO.setId(room.getId());
-	        //创建表 gameaccountindex记录某个游戏记录中4个玩家对应的索引
-	        //GameAccountIndex gameAccountIndex;
-	        //gameAccountIndex.setAccountId(accountId);
-	       // List<AvatarVO> avatarVos = roomVO.getPlayerList();
-	       // for (int i = 0 ; i<avatarVos.size();i++) {
-	        //	gameAccountIndex = new GameAccountIndex();
-	        	//int [] pai = avatarVos.get(i).getPaiArray()[0];
-	        	//gameAccountIndex.setAccountId(avatarVo.getAccount().getId());
-	        //	gameAccountIndex.setAccountindex(i);
-			//}
-	        
-	        
-	        //gameaccountindex记录某个游戏记录中4个玩家对应的索引
-	        
-	        //System.out.println("-RoomInfo insert index->>" + index);
 	        return index;
 	    }
 	    

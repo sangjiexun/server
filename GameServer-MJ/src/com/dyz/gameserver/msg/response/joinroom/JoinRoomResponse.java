@@ -13,7 +13,7 @@ public class JoinRoomResponse extends ServerResponse {
 		super(status,ConnectAPI.JOIN_ROOM_RESPONSE);
 		try {
 			if(status>0){
-					output.writeUTF(JsonUtilTool.toJson(roomVO));
+				output.writeUTF(JsonUtilTool.toJson(roomVO));
 			}
 			else{
 				output.writeUTF(roomVO.toString());

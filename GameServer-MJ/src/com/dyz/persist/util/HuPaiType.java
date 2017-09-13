@@ -79,7 +79,6 @@ public class HuPaiType {
 		}
 		else if(roomType == 3){
 			//长沙麻将
-			changSha(avatarShu, avatar, cardIndex);
 			return new ArrayList<>();
 		}else if(roomType == 4){
 			//广东麻将
@@ -523,18 +522,6 @@ public class HuPaiType {
 			return (cardPoint % 9) % 4;
 		}
 	}
-	
-	
-	/**
-	 * 长沙麻将
-	 * @param uuid
-	 * @param avatar
-	 * @param str
-	 * @return
-	 */
-	private static void changSha(Avatar  avatarShu , Avatar avatar , int cardIndex){
-	}
-	
 
 	/**
 	 * 亳州麻将

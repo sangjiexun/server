@@ -13,8 +13,7 @@ public class BackLoginResponse extends ServerResponse{
 		super(status,ConnectAPI.BACK_LOGIN_RESPONSE);
 		try {
 			if(status>0){
-					output.writeUTF(JsonUtilTool.toJson(roomVO));
-					//System.out.println(JsonUtilTool.toJson(roomVO));
+				output.writeUTF(JsonUtilTool.toJson(roomVO));
 			}
 			else{
 				output.writeUTF(roomVO.toString());
