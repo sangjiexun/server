@@ -43,14 +43,10 @@ public class MsgDispatcher {
 	 * @param clientRequest
      */
 	public void dispatchMsg( GameSession gameSession,ClientRequest clientRequest) {
-		
 		int msgCode = clientRequest.getMsgCode();
 		if(msgCode == 1000){//客户端请求断开链接
 			gameSession.close();
 		}
-		//if(msgCode%2==0){//请求协议号必须是奇数
-		//	return;
-		//}
 		MsgProcessor processor = getMsgProcessor(msgCode);
 		if(gameSession.isLogin() || processor instanceof INotAuthProcessor){
 			processor.handle(gameSession, clientRequest);

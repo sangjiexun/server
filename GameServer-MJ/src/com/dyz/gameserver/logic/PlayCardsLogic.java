@@ -176,7 +176,7 @@ public class PlayCardsLogic {
 	// 记录抢杠胡 多响情况
 	boolean hasPull = true;
 	// 单局是否结束，判断能否调用准备接口 10-11新增
-	boolean singleOver = true;
+	boolean singleOver = false;
 
 	// 游戏回放，
 	PlayRecordGameVO playRecordGame;
@@ -347,8 +347,6 @@ public class PlayCardsLogic {
 
 	/**
 	 * 摸牌
-	 *
-	 *
 	 */
 	public void pickCard() {
 		clearAvatar();
@@ -1103,9 +1101,7 @@ public class PlayCardsLogic {
 			if (huCount >= 2) {
 				// 重新分配庄家，下一局点炮的玩家坐庄
 				for (Avatar itemAva : playerList) {
-					if (playerList.get(pickAvatarIndex).getUuId() == itemAva
-							.getUuId()) {
-						// itemAva.avatarVO.setMain(true);
+					if (playerList.get(pickAvatarIndex).getUuId() == itemAva.getUuId()) {
 						bankerAvatar = itemAva;
 						itemAva.avatarVO.setMain(true);
 					} else {
@@ -1223,7 +1219,6 @@ public class PlayCardsLogic {
 
 			// 清除一些存储数据
 			avatar.getResultRelation().clear();
-			// avatar.avatarVO.setIsReady(false);10-11注释 在游戏开始之后就已经重置准备属性为false
 			avatar.avatarVO.getChupais().clear();
 			avatar.avatarVO.setCommonCards(0);
 			avatar.avatarVO.setHasMopaiChupai(false);
@@ -1334,21 +1329,12 @@ public class PlayCardsLogic {
 			roomLogic.destoryRoomLogic();
 			roomLogic = null;
 		}
-		// 判断该房间还有没有次数。有则清除玩家的准备状态，为下一局开始做准备
-		/*
-		 * else{ 10-11注释 在游戏开始之后就已经重置准备属性为false //清除当前房间牌的数据信息 for (Avatar
-		 * avatar : playerList) { avatar.avatarVO.setIsReady(false); } }
-		 */
 	}
 
 	/**
 	 * 出牌返回出牌点数和下一家玩家信息
-	 * 
-	 * @param
-	 *
 	 */
 	private void chuPaiCallBack() {
-		// 把出牌点数和下面该谁出牌发送会前端 下一家都还没有摸牌就要出牌了??
 		if (!hasHu && checkMsgAndSend()) {
 			// 如果没有吃，碰，杠，胡的情况，则下家自动摸牌
 			pickCard();
@@ -1384,14 +1370,15 @@ public class PlayCardsLogic {
 		bankerAvatar = null;
 		for (int i = 0; i < 13; i++) {
 			for (int k = 0; k < playerList.size(); k++) {
+				Avatar avatar = playerList.get(k);
 				if (bankerAvatar == null) {
-					if (playerList.get(k).avatarVO.isMain()) {
-						bankerAvatar = playerList.get(k);
+					if (avatar.avatarVO.isMain()) {
+						bankerAvatar = avatar;
 					}
 				}
-				playerList.get(k).putCardInList(listCard.get(nextCardindex));
-				playerList.get(k).oneSettlementInfo = "";
-				playerList.get(k).overOff = false;
+				avatar.putCardInList(listCard.get(nextCardindex));
+				avatar.oneSettlementInfo = "";
+				avatar.overOff = false;
 				nextCardindex++;
 			}
 		}

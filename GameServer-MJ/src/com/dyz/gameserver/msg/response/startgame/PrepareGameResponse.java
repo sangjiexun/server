@@ -15,11 +15,12 @@ public class PrepareGameResponse extends ServerResponse {
 	 * @param status
 	 * @param  avatarIndex 准备人的索引
      */
-	public PrepareGameResponse(int status,int avatarIndex) {
+	public PrepareGameResponse(int status,int avatarIndex, int phase) {
 		super(status, ConnectAPI.PrepareGame_MSG_RESPONSE);
 		try {
 			JSONObject json = new JSONObject();
 			json.put("avatarIndex", avatarIndex);
+			json.put("phase", phase);
 			output.writeUTF(json.toString());
 		} catch (IOException e) {
 			e.printStackTrace();

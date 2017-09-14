@@ -14,7 +14,7 @@ public class CardVO {
 
     
     
-  public int getOnePoint() {
+    public int getOnePoint() {
 		return onePoint;
 	}
 

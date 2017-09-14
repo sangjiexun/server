@@ -76,6 +76,10 @@ public class ConnectAPI {
 	public static int GAVEUP_REQUEST = 0x100015;
 	//有吃碰杠胡需要操作的返回信息/一个房间次数用完之后返回全局信息
 	public static int RETURN_INFO_RESPONSE =  0x100000;
+
+	public static int XIAZUI_REQUEST = 0x107777; // 亳州麻将下嘴请求
+	public static int START_XIAZUI_RESPONSE = 0x107778;  // 亳州麻将开始下嘴通知
+	public static int XIAZUI_RESPONSE = 0x107779;  // 亳州麻将下嘴通知
 	
 	//游戏错误码返回
 	public static int ERROR_RESPONSE = 0xffff09;

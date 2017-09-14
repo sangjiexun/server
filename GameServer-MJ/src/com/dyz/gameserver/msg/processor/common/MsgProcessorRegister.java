@@ -28,6 +28,7 @@ import com.dyz.gameserver.msg.processor.remotecontrol.RemoteControlProcessor;
 import com.dyz.gameserver.msg.processor.standings.StandingsMsgProcessor;
 import com.dyz.gameserver.msg.processor.standings.StandingsMsgProcessorSearch;
 import com.dyz.gameserver.msg.processor.startgame.PrepareGameMSGProcessor;
+import com.dyz.gameserver.msg.processor.xiazui.XiaZuiMsgProcessor;
 
 
 /**
@@ -52,6 +53,8 @@ public enum MsgProcessorRegister {
 	pickPai(ConnectAPI.PICKCARD_REQUEST,new PickCardMsgProcessor()),
 	/**出牌*/
 	chuPai(ConnectAPI.CHUPAI_REQUEST,new ChuPaiMsgProcessor()),
+	/**下嘴*/
+	xiazui(ConnectAPI.XIAZUI_REQUEST,new XiaZuiMsgProcessor()),
 	/**退出房间*/
 	outRoom(ConnectAPI.OUT_ROOM_REQUEST,new OutRoomMsgProcessor()),
 	/**申请解散房间*/

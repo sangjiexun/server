@@ -37,6 +37,16 @@ public class Avatar implements GameObj {
     public boolean canHu = true;
     
     public boolean qiangHu = true;
+    
+    /**
+     * 额外加分的牌
+     */
+    public int[] extraScoreCardIndex;
+    /**
+     * 额外加分的倍数
+     */
+    public int extraScoreMultiple;
+    
     /**
      * 是否是一局结算时掉线
      */

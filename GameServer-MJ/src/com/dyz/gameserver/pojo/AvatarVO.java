@@ -19,10 +19,11 @@ public class AvatarVO {
      */
     private int roomId;
     /**
-     * 是否准备
+     * 是否准备。可能有多个阶段的准备。默认的一个为同意开始下一轮游戏。
      */
-    private boolean isReady = false;
-    /**
+    private boolean[] isReady = {false, false, false};
+
+	/**
      * 是否是庄家
      */
     private boolean isMain = false;
@@ -89,12 +90,29 @@ public class AvatarVO {
         this.roomId = roomId;
     }
 
-    public boolean getIsReady() {
-        return isReady;
+    public boolean[] getIsReady() {
+		return isReady;
+	}
+
+	public void setIsReady(boolean[] isReady) {
+		this.isReady = isReady;
+	}
+
+    public boolean getSingleIsReady(int phase) {
+        return isReady[phase];
     }
 
-    public void setIsReady(boolean ready) {
-        isReady = ready;
+    public void setSingleIsReady(boolean ready, int phase) {
+        isReady[phase] = ready;
+    }
+    
+    /**
+     * 重置所有ready状态。
+     */
+    public void setAllIsReady(boolean ready) {
+    	for(int i = 0; i < isReady.length; i++) {
+    		isReady[i] = ready;
+    	}
     }
 
     public boolean isMain() {

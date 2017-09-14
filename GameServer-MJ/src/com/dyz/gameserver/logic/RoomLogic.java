@@ -19,10 +19,14 @@ import com.dyz.gameserver.msg.response.outroom.DissolveRoomResponse;
 import com.dyz.gameserver.msg.response.outroom.OutRoomResponse;
 import com.dyz.gameserver.msg.response.startgame.PrepareGameResponse;
 import com.dyz.gameserver.msg.response.startgame.StartGameResponse;
+import com.dyz.gameserver.msg.response.xiazui.StartXiaZuiResponse;
+import com.dyz.gameserver.msg.response.xiazui.XiaZuiResponse;
 import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.HuReturnObjectVO;
+import com.dyz.gameserver.pojo.ReadyVO;
 import com.dyz.gameserver.pojo.RoomVO;
+import com.dyz.gameserver.pojo.XiaZuiVO;
 import com.dyz.myBatis.model.Account;
 import com.dyz.myBatis.services.AccountService;
 
@@ -32,7 +36,6 @@ import com.dyz.myBatis.services.AccountService;
  */
 public class RoomLogic {
     private List<Avatar> playerList;
-    private boolean isBegin = false;
     private  Avatar createAvator;
     private RoomVO roomVO;
     private PlayCardsLogic playCardsLogic;
@@ -57,9 +60,9 @@ public class RoomLogic {
      */
     private int roomType = 1;
     /**
-     * 是否添加字牌
+     * 准备阶段
      */
-    private boolean addWordCard = false;
+    private int readyPhase = 0;
   //战绩存取每一局的id
   	List<Integer> standingsDetailsIds = new ArrayList<Integer>();
     /**
@@ -80,7 +83,6 @@ public class RoomLogic {
     public void CreateRoom(Avatar avatar){
         createAvator = avatar;
         roomVO.setPlayerList(new ArrayList<AvatarVO>());
-        //avatar.avatarVO.setIsReady(true);10-11注释 在游戏开始之后就已经重置准备属性为false
         playerList = new ArrayList<Avatar>();
         avatar.avatarVO.setMain(true);
         avatar.setRoomVO(roomVO);
@@ -92,7 +94,7 @@ public class RoomLogic {
      * 进入房间,
      * @param avatar
      */
-    public  boolean intoRoom(Avatar avatar){
+    public boolean intoRoom(Avatar avatar){
     	synchronized(roomVO){
     		if(playerList.size() == 4){
     			try {
@@ -101,16 +103,8 @@ public class RoomLogic {
     				e.printStackTrace();
     			}
     			return false;
-    		}else {
-    			/*//二期优化注释  for (int i = 0; i < playerList.size(); i++) {
-    				if(avatar.getUuId() == playerList.get(i).getUuId()){
-    					//如果用户在本房间中，则直接返回房间信息
-    					returnBackAction(avatar);
-    					return true;
-    				}
-				}*/
+    		} else {
     			avatar.avatarVO.setMain(false);
-    			//avatar.avatarVO.setIsReady(false);
     			avatar.avatarVO.setRoomId(roomVO.getRoomId());//房间号也放入avatarvo中
     			avatar.setRoomVO(roomVO);
     			noticJoinMess(avatar);//通知房间里面的其他几个玩家
@@ -136,26 +130,6 @@ public class RoomLogic {
             playerList.get(i).getSession().sendMsg(new JoinRoomNoice(1,avatarVo));
 		}
     }
-    
-    /**
-     * 检测是否可以开始游戏
-     * @throws IOException 
-     */
-    public void checkCanBeStartGame() throws IOException{
-    	if(playerList.size() == 4){ //房间里面4个人且都准备好了则开始游戏
-    		boolean flag = true;
-    		for (Avatar avatar : playerList) {
-    			if(!avatar.avatarVO.getIsReady()){ //还有人没有准备
-    				flag = false;
-    				break;
-    			}
-			}
-    		if(flag) {
-				isBegin = true;
-				startGameRound();
-    		}
-    	}
-    }
 
     /**
      * 退出房间
@@ -171,13 +145,11 @@ public class RoomLogic {
         json.put("status_code", "0");
         json.put("uuid", avatar.getUuId());
         
-        if(avatar.avatarVO.isMain()){
-        	//群主退出房间就是解散房间
+        if(avatar.avatarVO.isMain()){ //群主退出房间就是解散房间
         	json.put("type", "1");
         	exitRoomDetail(json);
         } else {
         	json.put("type", "0");
-      	    //退出房间。通知房间里面的其他玩家
         	exitRoomDetail(avatar, json);
         }
     }
@@ -312,81 +284,123 @@ public class RoomLogic {
     	return playCardsLogic.huPai( avatar, cardIndex,type);
     	
     }
+
+    /**
+     * 检测是否可以开始游戏
+     * @throws IOException 
+     */
+    private boolean CheckPhaseAllReady(int phase){
+    	if(playerList.size() != 4){ //房间里面4个人且都准备好了则开始游戏
+    		return false;
+    	}
+    	
+		for (Avatar avatar : playerList) {
+			if(!avatar.avatarVO.getSingleIsReady(phase)){
+				return false;
+			}
+		}
+		return true;
+    }
     
+    private void EnterNextPhase() {
+		startGameRound(readyPhase);
+		readyPhase += 1;
+		if (readyPhase == 1) {
+			if (roomVO.getXiazui() == 0) {//下嘴阶段
+				for (Avatar ava: playerList) {
+					ava.getSession().sendMsg(new StartXiaZuiResponse(1));
+				}
+			} else {//跳过下嘴阶段
+				startGameRound(readyPhase);
+				readyPhase += 1;
+			}
+		}
+    }
     /**
      * 游戏准备
      * @param avatar
      * @throws IOException 
      */
-    public void readyGame(Avatar avatar) throws IOException{
-    		  //返回房间
-    		/*//二期优化注释  if(avatar.avatarVO.getRoomId() != roomVO.getRoomId()){
-    			////system.out.println("你不是这个房间的");
-    			try {
-    				avatar.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000006));
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			return;
-    		}*/
-    	if(count == roomVO.getRoundNumber() || playCardsLogic.singleOver && count != roomVO.getRoundNumber()){//只有单局结束之后调用准备接口才有用10-11新增
-    		if(count <= 0) { //房间次数已经为0
-    			for (Avatar  ava: playerList) {
-    				ava.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000010));
-    			}
-    		} else {
-    			avatar.avatarVO.setIsReady(true);
-    			int avatarIndex = playerList.indexOf(avatar);
-    			//成功则返回
-    			for (Avatar ava : playerList) {
-    				ava.getSession().sendMsg(new PrepareGameResponse(1,avatarIndex));
-    			}
-    			checkCanBeStartGame();
-    		}
-    	} else {
-    		System.out.println("游戏还没有结束不能调用准备接口!");
-    	}
+    public void readyGame(Avatar avatar, ReadyVO readyVO) throws IOException{
+		if(count <= 0) { //房间次数已经为0 //正常不会出现这种情况
+			for (Avatar ava: playerList) {
+				ava.getSession().sendMsg(new ErrorResponse(ErrorCode.Error_000010));
+			}
+			return;
+		}
+		if(readyVO.getPhase() != readyPhase) { //接到错误的阶段准备包。
+			return;
+		}
+		
+		avatar.avatarVO.setSingleIsReady(true, readyPhase);
+		int avatarIndex = playerList.indexOf(avatar);
+		//成功则返回
+		for (Avatar ava : playerList) {
+			ava.getSession().sendMsg(new PrepareGameResponse(1, avatarIndex, readyPhase));
+		}
+		System.out.println("   wxd>>>  readygame  p " + readyPhase +
+				" ? " + CheckPhaseAllReady(readyPhase) + " f? " +roomVO.getXiazui());
+		if(CheckPhaseAllReady(readyPhase)) {
+			EnterNextPhase();
+		}
     }
     /**
      * 开始一回合新的游戏
+     * @param phase 1-全体准备，开始游戏 2-发牌前一刻
      */
-    private void startGameRound(){
-        assert(count > 0);
-        count--;
-        roomVO.setCurrentRound(roomVO.getCurrentRound() +1);
-        if((count +1) != roomVO.getRoundNumber()){
-    	    //说明不是第一局
-    	    Avatar avatar = playCardsLogic.bankerAvatar;
-    	    playCardsLogic = new PlayCardsLogic();
-    	    playCardsLogic.bankerAvatar = avatar;
-    	    //摸牌玩家索引初始值为庄家索引
-    	    playCardsLogic.setPickAvatarIndex(playerList.indexOf(avatar));
-        } else {
-    	    playCardsLogic = new PlayCardsLogic();
-    	    playCardsLogic.setPickAvatarIndex(0);
-        }
-
-        playCardsLogic.setCreateRoomRoleId(createAvator.getUuId());
-        playCardsLogic.setPlayerList(playerList);
-        //playCardsLogic.initGui(roomVO);
-        playCardsLogic.initCard(roomVO);
-       
-        Avatar avatar;
-        Account account ;
-        for(int i=0;i<playerList.size();i++){
-    	    //清除各种数据  1：本局胡牌时返回信息组成对象 ，
-    	    avatar = playerList.get(i);
-    	    avatar.avatarVO.setIsReady(false);//重置是否准备状态 10-11新增
-    	    avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
-            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
-            //修改玩家是否玩一局游戏的状态
-            account = AccountService.getInstance().selectByPrimaryKey(avatar.avatarVO.getAccount().getId());
-            if(account.getIsGame().equals("0")){
-        	    account.setIsGame("1");
-        	    AccountService.getInstance().updateByPrimaryKeySelective(account);
-        	    avatar.avatarVO.getAccount().setIsGame("1");
-            }
-        }
+    private void startGameRound(int phase){
+    	if(phase == 0) { //0-全体准备，开始游戏
+	    	System.out.println("    wxd>>>  start Game Round" + count);
+	        assert(count > 0);
+	        count--;
+	        roomVO.setCurrentRound(roomVO.getCurrentRound() +1);
+	        if((count +1) != roomVO.getRoundNumber()){
+	    	    //说明不是第一局
+	    	    Avatar avatar = playCardsLogic.bankerAvatar;
+	    	    playCardsLogic = new PlayCardsLogic();
+	    	    playCardsLogic.bankerAvatar = avatar;
+	    	    //摸牌玩家索引初始值为庄家索引
+	    	    playCardsLogic.setPickAvatarIndex(playerList.indexOf(avatar));
+	        } else {
+	    	    playCardsLogic = new PlayCardsLogic();
+	    	    playCardsLogic.setPickAvatarIndex(0);
+	        }
+	        
+	        playCardsLogic.setCreateRoomRoleId(createAvator.getUuId());
+	        playCardsLogic.setPlayerList(playerList);
+	    
+    	} else if(phase == 1) { //1-发牌前一刻
+	        playCardsLogic.initCard(roomVO);
+	       
+	        Account account;
+	        for(int i = 0;i < playerList.size(); i++){
+	    	    //清除各种数据  1：本局胡牌时返回信息组成对象 ，
+	        	Avatar avatar = playerList.get(i);
+	    	    avatar.avatarVO.setAllIsReady(false);//重置是否准备状态 10-11新增
+	    	    avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
+	            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
+	            //修改玩家是否玩一局游戏的状态
+	            account = AccountService.getInstance().selectByPrimaryKey(avatar.avatarVO.getAccount().getId());
+	            if(account.getIsGame().equals("0")){
+	        	    account.setIsGame("1");
+	        	    AccountService.getInstance().updateByPrimaryKeySelective(account);
+	        	    avatar.avatarVO.getAccount().setIsGame("1");
+	            }
+	        }
+    	}
+    }
+    
+    public void SetXiaZui(Avatar avatar, XiaZuiVO xiazuiVO) {
+    	int[] zuiList = new int[3];
+    	for (int i = 0; i < 3; i++) {
+    		zuiList[i] = i * 3 + xiazuiVO.getXiazuiList();
+    	}
+    	avatar.extraScoreCardIndex = zuiList;
+    	avatar.extraScoreMultiple = xiazuiVO.getXiazuiMultiple();
+    	
+    	System.out.println("   wxd>>>   test xiazui  " + xiazuiVO.getXiazuiList() + "  mul " + xiazuiVO.getXiazuiMultiple());
+    	
+    	avatar.getSession().sendMsg(new XiaZuiResponse(1, xiazuiVO));
     }
     
     /**
@@ -463,20 +477,6 @@ public class RoomLogic {
 		JSONObject json  = new JSONObject();
 		json.put("type","3");
 		for (Avatar avat : playerList) {
-//			playCardsLogic.getPlayerList().remove(avat);//9-22新增
-			/*avatarVO = new AvatarVO();
-			avatarVO.setAccount(avat.avatarVO.getAccount());
-			avatarVO.setIP(avat.avatarVO.getIP());
-			avat.getSession().sendMsg(new DissolveRoomResponse(1, json.toString()));
-			gamesession = avat.getSession();
-			avat = new Avatar();
-			avat.avatarVO = avatarVO;
-			gamesession.setRole(avat);
-			gamesession.setLogin(true);
-			avat.setSession(gamesession);
-			avat.avatarVO.setIsOnLine(true);
-			GameServerContext.add_onLine_Character(avat);*/
-			isBegin = false;
 			avatarVO = new AvatarVO();
 			avatarVO.setAccount(avat.avatarVO.getAccount());
 			avatarVO.setIP(avat.avatarVO.getIP());
@@ -490,25 +490,19 @@ public class RoomLogic {
 				gamesession.setLogin(true);
 				avat.getSession().sendMsg(new DissolveRoomResponse(1, json.toString()));
 				GameServerContext.add_onLine_Character(avat);
-			}
-			else{
-			   //不在线则 更新
+			} else{ //不在线则 更新
 				GameServerContext.add_offLine_Character(avat);
 			}
 			try{
 				RoomManager.getInstance().removeUuidAndRoomId(avat.avatarVO.getAccount().getUuid(), roomVO.getRoomId());
-				
-			 
-				
+			
 			} catch (Exception e) {
-				// TODO: handle exception
 				e.printStackTrace();
 			}
-				}
+		}
 		hasDissolve = true;
 		playCardsLogic = null;//9-22新增
 		RoomManager.getInstance().destroyRoom(roomVO);
-		//new RoomLogic(roomVO);
 	}
 	/**
 	 * 房主退出房间，及解散房间，详细清除数据,销毁房间逻辑
@@ -518,20 +512,6 @@ public class RoomLogic {
 		AvatarVO avatarVO;
 		GameSession gamesession;
 		for (Avatar avat : playerList) {
-			//playCardsLogic.getPlayerList().remove(avat);//房主退出房间，打牌逻辑还未形成
-			/*avatarVO = new AvatarVO();
-			avatarVO.setAccount(avat.avatarVO.getAccount());
-			gamesession = avat.getSession();
-			avatarVO.setIP(avat.avatarVO.getIP());
-			gamesession.sendMsg(new OutRoomResponse(1, json.toString()));
-			avat = new Avatar();
-			avat.avatarVO = avatarVO;
-			gamesession.setRole(avat);
-			gamesession.setLogin(true);
-			avat.setSession(gamesession);
-			avat.avatarVO.setIsOnLine(true);
-			GameServerContext.add_onLine_Character(avat);*/
-			isBegin = false;
 			avatarVO = new AvatarVO();
 			avatarVO.setAccount(avat.avatarVO.getAccount());
 			avatarVO.setIP(avat.avatarVO.getIP());
@@ -568,8 +548,6 @@ public class RoomLogic {
     	}
 		roomVO.getPlayerList().remove(avatar.avatarVO);
 		playerList.remove(avatar);
-		//playCardsLogic.getPlayerList().remove(avatar);//只有打牌逻辑为空的时候才有退出房间一说，其他都是解散房间
-		//isBegin = false;
 		AvatarVO avatarVO;
 		GameSession gamesession;
 		avatarVO = new AvatarVO();
