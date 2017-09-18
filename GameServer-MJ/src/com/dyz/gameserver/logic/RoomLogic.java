@@ -63,6 +63,10 @@ public class RoomLogic {
      * 准备阶段
      */
     private int readyPhase = 0;
+    /**
+     * 最终的阶段号
+     */
+    private int finalPhase = 1;
   //战绩存取每一局的id
   	List<Integer> standingsDetailsIds = new ArrayList<Integer>();
     /**
@@ -306,7 +310,7 @@ public class RoomLogic {
 		startGameRound(readyPhase);
 		readyPhase += 1;
 		if (readyPhase == 1) {
-			if (roomVO.getXiazui() == 0) {//下嘴阶段
+			if (roomVO.getXiazui() == 0 && roomVO.getRoomType() == 5) {//下嘴阶段
 				for (Avatar ava: playerList) {
 					ava.getSession().sendMsg(new StartXiaZuiResponse(1));
 				}
@@ -314,6 +318,13 @@ public class RoomLogic {
 				startGameRound(readyPhase);
 				readyPhase += 1;
 			}
+		}
+		
+		if(readyPhase > finalPhase) { //阶段结束后重置
+	        readyPhase = 0;
+	        for(int i = 0;i < playerList.size(); i++){
+	        	playerList.get(i).avatarVO.setAllIsReady(false);
+	        }
 		}
     }
     /**
@@ -376,7 +387,6 @@ public class RoomLogic {
 	        for(int i = 0;i < playerList.size(); i++){
 	    	    //清除各种数据  1：本局胡牌时返回信息组成对象 ，
 	        	Avatar avatar = playerList.get(i);
-	    	    avatar.avatarVO.setAllIsReady(false);//重置是否准备状态 10-11新增
 	    	    avatar.avatarVO.setHuReturnObjectVO(new HuReturnObjectVO());
 	            avatar.getSession().sendMsg(new StartGameResponse(1,avatar.getPaiArray(),playerList.indexOf(playCardsLogic.bankerAvatar),playCardsLogic.perGui,playCardsLogic.perTouzi));
 	            //修改玩家是否玩一局游戏的状态
@@ -391,11 +401,15 @@ public class RoomLogic {
     }
     
     public void SetXiaZui(Avatar avatar, XiaZuiVO xiazuiVO) {
-    	int[] zuiList = new int[3];
-    	for (int i = 0; i < 3; i++) {
-    		zuiList[i] = i * 3 + xiazuiVO.getXiazuiList();
+    	if(xiazuiVO.getXiazuiList() == 0) {
+        	avatar.extraScoreCardIndexs = null;
+    	} else {
+	    	int[] zuiList = new int[3];
+	    	for (int i = 0; i < 3; i++) {
+	    		zuiList[i] = i * 3 + xiazuiVO.getXiazuiList();
+	    	}
+	    	avatar.extraScoreCardIndexs = zuiList;
     	}
-    	avatar.extraScoreCardIndex = zuiList;
     	avatar.extraScoreMultiple = xiazuiVO.getXiazuiMultiple();
     	
     	System.out.println("   wxd>>>   test xiazui  " + xiazuiVO.getXiazuiList() + "  mul " + xiazuiVO.getXiazuiMultiple());

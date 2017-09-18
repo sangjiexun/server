@@ -27,10 +27,10 @@ public class PrepareGameMSGProcessor extends MsgProcessor implements
 	@Override
 	public void process(GameSession gameSession, ClientRequest request) throws Exception {
 		String a = request.getString();
-		System.out.println("  wxd>>> " + a);
+		System.out.println("  wxd>>>  get pahse " + a);
         //ReadyVO readyVO = JsonUtilTool.fromJson(a, ReadyVO.class);
         ReadyVO readyVO = new ReadyVO();
-		System.out.println("  wxd>>>  get pahse " + a);
+		System.out.println("  wxd>>>  get pahse " + a.split(":")[1].split(",")[0]);
         readyVO.setPhase(Integer.parseInt(a.split(":")[1].split(",")[0]));
         
 		RoomVO roomVo = gameSession.getRole(Avatar.class).getRoomVO();

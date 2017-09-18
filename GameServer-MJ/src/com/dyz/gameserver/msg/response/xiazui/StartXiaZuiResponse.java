@@ -20,7 +20,7 @@ public class StartXiaZuiResponse extends ServerResponse {
      * @param
      */
     public StartXiaZuiResponse(int status) {
-        super(status, ConnectAPI.XIAZUI_RESPONSE);
+        super(status, ConnectAPI.START_XIAZUI_RESPONSE);
         try {
             output.writeUTF("-");
         } catch (IOException e) {

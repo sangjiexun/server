@@ -1035,19 +1035,17 @@ public class PlayCardsLogic {
 						;
 						// 两个人之间建立关联，游戏结束算账用
 						if (!validMa.isEmpty()) {
-							List<Integer> newValidMa = HuPaiType.getInstance()
-									.getHuType(playerList.get(curAvatarIndex),
-											avatar, roomVO.getRoomType(),
-											cardIndex, playerList, mas,
-											huCount, type, roomVO.getGui() == 3, bankerAvatar);
+							List<Integer> newValidMa = HuPaiType.getInstance().getHuType(
+										playerList, avatar, playerList.get(curAvatarIndex),
+										roomVO.getRoomType(), cardIndex, mas, huCount, type, 
+										roomVO.getGui() == 3, bankerAvatar);
 							for (Integer j : newValidMa) {
 								validMa.add(j);
 							}
 						} else {
 							validMa = HuPaiType.getInstance().getHuType(
-									playerList.get(curAvatarIndex), avatar,
-									roomVO.getRoomType(), cardIndex,
-									playerList, mas, huCount, type,
+									playerList, avatar, playerList.get(curAvatarIndex), 
+									roomVO.getRoomType(), cardIndex, mas, huCount, type,
 									roomVO.getGui() == 3, bankerAvatar);
 						}
 						// 整个房间统计每一局游戏 杠，胡的总次数
@@ -1072,18 +1070,17 @@ public class PlayCardsLogic {
 					;
 					// 两个人之间建立关联，游戏结束算账用 自摸不会出现抢胡的情况
 					if (!validMa.isEmpty()) {
-						List<Integer> newValidMa = HuPaiType.getInstance()
-								.getHuType(playerList.get(curAvatarIndex),
-										avatar, roomVO.getRoomType(),
-										cardIndex, playerList, mas, huCount,
-										type, roomVO.getGui() == 3, bankerAvatar);
+						List<Integer> newValidMa = HuPaiType.getInstance().getHuType(
+									playerList, avatar, playerList.get(curAvatarIndex),
+									roomVO.getRoomType(), cardIndex, mas, huCount, type, 
+									roomVO.getGui() == 3, bankerAvatar);
 						for (Integer j : newValidMa) {
 							validMa.add(j);
 						}
 					} else {
-						validMa = HuPaiType.getInstance().getHuType(avatar,
-								avatar, roomVO.getRoomType(), cardIndex,
-								playerList, mas, huCount, "", roomVO.getGui() == 3, bankerAvatar);
+						validMa = HuPaiType.getInstance().getHuType(
+								playerList, avatar, avatar, roomVO.getRoomType(), cardIndex,
+								mas, huCount, "", roomVO.getGui() == 3, bankerAvatar);
 					}
 					roomVO.updateEndStatistics(avatar.getUuId() + "", "zimo", 1);
 					flag = true;
@@ -1651,7 +1648,7 @@ public class PlayCardsLogic {
 		
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小对
-			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getGui()==0?-1:roomVO.getGuiPai());
+			int isSeven = HuPaiType.CheckHuTypeSevenDouble(paiList, roomVO.getGui()==0?-1:roomVO.getGuiPai());
 			if (isSeven == 0) {
 				// System.out.println("没有七小对");
 			} else {
@@ -1684,7 +1681,7 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = HuPaiType.CheckSevenDouble(paiList, roomVO.getGui() != 0?roomVO.getGuiPai():-1);
+			int isSeven = HuPaiType.CheckHuTypeSevenDouble(paiList, roomVO.getGui() != 0?roomVO.getGuiPai():-1);
 			if (isSeven != 0) {
 				//if (isSeven == 1) {
 				//	System.out.println("七对");
@@ -1715,7 +1712,7 @@ public class PlayCardsLogic {
 		boolean flag = false;
 		if (roomVO.getSevenDouble() && !flag) {
 			// 可七小队
-			int isSeven = HuPaiType.CheckSevenDouble(paiList, -1);
+			int isSeven = HuPaiType.CheckHuTypeSevenDouble(paiList, -1);
 			if (isSeven != 0) {
 				//if (isSeven == 1) {
 				//	System.out.println("七对");
@@ -1763,7 +1760,7 @@ public class PlayCardsLogic {
 		
 		//System.out.println("   wxd>>>  check hu bozhou  " + roomVO.getQueYiMen());
 		if (true) {//roomVO.getQueYiMen()) { //缺一门 //TODO
-			boolean tmpcheckQueYiMen = HuPaiType.CheckQueYiMen(paiList);
+			boolean tmpcheckQueYiMen = HuPaiType.CheckHuTypeQueYiMen(paiList);
 			if (!tmpcheckQueYiMen) // 缺一门
 			{
 				return false;
@@ -1771,7 +1768,7 @@ public class PlayCardsLogic {
 		}
 		
 		if (roomVO.getSevenDouble()) { // 可七小对
-			int isSeven = HuPaiType.CheckSevenDouble(paiList, -1);
+			int isSeven = HuPaiType.CheckHuTypeSevenDouble(paiList, -1);
 			if (isSeven != 0) {
 				return true;
 			}

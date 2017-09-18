@@ -49,6 +49,9 @@ public class MsgDispatcher {
 		}
 		MsgProcessor processor = getMsgProcessor(msgCode);
 		if(gameSession.isLogin() || processor instanceof INotAuthProcessor){
+			if(msgCode != 0x30) { //不打印心跳包
+				System.out.println(String.format("   s <<<====== c 0x%06x", msgCode));
+			}
 			processor.handle(gameSession, clientRequest);
 		}
 		

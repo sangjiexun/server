@@ -77,7 +77,9 @@ public class GameSession implements GameObj {
 			//system.out.println("session == "+session+" session.isConnected ==  "+session.isConnected()+" session.isClosing =  "+session.isClosing());
 			return null;
 		}
-		System.out.println("   wxd>>> realsend " + msg.toString());
+		if(!msg.toString().contains("HeadResponse")) { //不打印心跳包
+			System.out.println("   s ------>>> c " + msg.toString());
+		}
 		return session.write(msg);
 	}
 

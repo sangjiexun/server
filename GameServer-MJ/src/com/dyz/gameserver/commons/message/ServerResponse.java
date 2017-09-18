@@ -30,20 +30,19 @@ public class ServerResponse implements ResponseMsg {
 	}
 
 	public synchronized  IoBuffer entireMsg() {
-		
-			byte[] body = output.toByteArray();
-			/* 标志 byte 长度short */
-			int length = MsgProtocol.flagSize+MsgProtocol.lengthSize+MsgProtocol.msgCodeSize+ body.length+4;
-			//System.out.println("计算长度"+length);
-			IoBuffer buf = IoBuffer.allocate(length);
-			buf.put(MsgProtocol.defaultFlag);//flag
-			buf.putInt(length);//lengh
-			buf.putInt(msgCode);
-			buf.putInt(status);
-			buf.put(body);
-			buf.flip();
-			//System.out.println("buf实际长度---"+buf.capacity());
-			return buf;
+		byte[] body = output.toByteArray();
+		/* 标志 byte 长度short */
+		int length = MsgProtocol.flagSize+MsgProtocol.lengthSize+MsgProtocol.msgCodeSize+ body.length+4;
+		//System.out.println("计算长度"+length);
+		IoBuffer buf = IoBuffer.allocate(length);
+		buf.put(MsgProtocol.defaultFlag);//flag
+		buf.putInt(length);//lengh
+		buf.putInt(msgCode);
+		buf.putInt(status);
+		buf.put(body);
+		buf.flip();
+		//System.out.println("buf实际长度---"+buf.capacity());
+		return buf;
 	}
 
 	/**

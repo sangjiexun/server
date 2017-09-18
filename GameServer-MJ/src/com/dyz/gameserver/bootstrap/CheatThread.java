@@ -12,10 +12,14 @@ public class CheatThread extends Thread {
 		RoomLogic roomlogic = null;
 		System.out.println("作弊器线程开始");
 		while(true){
-			try {				
+			try {
 				System.out.println("请输入操作：\n 1：进入房间\n 2：显示当前牌\n 3：替换牌");
 				Scanner sc = new Scanner(System.in);
 				String s = sc.nextLine();
+				
+				if(s == null || s == "" || s == " ") {
+					continue;
+				}
 				
 				int key = Integer.parseInt(s);
 				switch (key) {
