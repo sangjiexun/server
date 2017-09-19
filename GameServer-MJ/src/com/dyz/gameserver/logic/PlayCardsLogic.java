@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -33,6 +35,7 @@ import com.dyz.gameserver.msg.response.peng.PengResponse;
 import com.dyz.gameserver.msg.response.pickcard.OtherPickCardResponse;
 import com.dyz.gameserver.msg.response.pickcard.PickCardResponse;
 import com.dyz.gameserver.msg.response.roomcard.RoomCardChangerResponse;
+import com.dyz.gameserver.msg.response.xiazui.XiaZuiResponse;
 import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.FinalGameEndItemVo;
@@ -361,7 +364,7 @@ public class PlayCardsLogic {
 			PlayRecordOperation(pickAvatarIndex, tempPoint, 2, -1, null, null);
 
 			currentCardPoint = tempPoint;
-			Avatar avatar = playerList.get(pickAvatarIndex);
+			final Avatar avatar = playerList.get(pickAvatarIndex);
 			avatar.avatarVO.setHasMopaiChupai(true);// 修改出牌 摸牌状态
 			avatar.qiangHu = true;
 			avatar.canHu = true;
@@ -403,6 +406,21 @@ public class PlayCardsLogic {
 				avatar.getSession().sendMsg(
 						new ReturnInfoResponse(1, sb.toString()));
 			}
+			
+			//出牌倒计时
+			TimerTask task = new TimerTask() {
+				@Override
+				public void run() {
+					System.out.println("----------- Time Up -----------");
+			        //putOffCard(avatar, 1);
+				}
+			};
+			
+			System.out.println("----------- Start Count  -----------");
+			Timer timer = new Timer();
+			long delay = 3000;
+			timer.schedule(task, delay);
+			//TODO cd Start Counting
 
 		} else {
 			// System.out.println("流局");
@@ -982,6 +1000,11 @@ public class PlayCardsLogic {
 		}
 		StringBuffer sb = new StringBuffer();
 		avatar.setCardListStatus(cardIndex, 3);
+		
+
+		for (Avatar itemAva : playerList) {
+			itemAva.getSession().sendMsg(new XiaZuiResponse(1, avatar.xiazuiVO));
+		}
 		
 		int playRecordType = 6;// 胡牌的分类
 		int maCount = avatar.getRoomVO().getMa();

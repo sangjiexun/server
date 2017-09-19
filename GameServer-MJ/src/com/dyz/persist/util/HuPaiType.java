@@ -64,7 +64,7 @@ public class HuPaiType {
 			score += extraScore;
 			
 			if(huCount == 1){
-				str =avatarLose.getUuId()+":"+cardIndex+":" + txt;
+				str = avatarLose.getUuId()+":"+cardIndex+":" + txt;
 				avatar.getHuVO().updateTotalInfo("hu", str);
 				avatar.getHuVO().updateGangAndHuInfos("2",1*score);
 				
@@ -88,7 +88,7 @@ public class HuPaiType {
 					}
 				}
 			} else{ //点炮  多响  //TODO 暂时跟单响一个逻辑  
-				str =avatarLose.getUuId()+":"+cardIndex+":" + txt;
+				str = avatarLose.getUuId()+":"+cardIndex+":" + txt;
 				avatar.getHuVO().updateTotalInfo("hu", str);
 				avatar.getHuVO().updateGangAndHuInfos("2",1*score);
 				

@@ -5,6 +5,7 @@ import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.HuReturnObjectVO;
 import com.dyz.gameserver.pojo.RoomVO;
+import com.dyz.gameserver.pojo.XiaZuiVO;
 import com.dyz.gameserver.sprite.Character;
 import com.dyz.gameserver.sprite.base.GameObj;
 import com.dyz.gameserver.sprite.tool.AsyncTaskQueue;
@@ -46,6 +47,8 @@ public class Avatar implements GameObj {
      * 额外加分的倍数
      */
     public int extraScoreMultiple;
+    
+    public XiaZuiVO xiazuiVO;
     
     /**
      * 是否是一局结算时掉线

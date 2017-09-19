@@ -404,17 +404,15 @@ public class RoomLogic {
     	if(xiazuiVO.getXiazuiList() == 0) {
         	avatar.extraScoreCardIndexs = null;
     	} else {
-	    	int[] zuiList = new int[3];
-	    	for (int i = 0; i < 3; i++) {
-	    		zuiList[i] = i * 3 + xiazuiVO.getXiazuiList();
+	    	int[] zuiList = new int[9];
+	    	for (int i = 0; i < 9; i++) {
+	    		zuiList[i] = i * 3 + xiazuiVO.getXiazuiList() % 3;
 	    	}
 	    	avatar.extraScoreCardIndexs = zuiList;
     	}
     	avatar.extraScoreMultiple = xiazuiVO.getXiazuiMultiple();
     	
-    	System.out.println("   wxd>>>   test xiazui  " + xiazuiVO.getXiazuiList() + "  mul " + xiazuiVO.getXiazuiMultiple());
-    	
-    	avatar.getSession().sendMsg(new XiaZuiResponse(1, xiazuiVO));
+    	avatar.xiazuiVO = xiazuiVO;
     }
     
     /**
