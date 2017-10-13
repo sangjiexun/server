@@ -93,8 +93,6 @@ public class Avatar implements GameObj {
      */
     public List<String> huAvatarDetailInfo = new ArrayList<String>();
     
-    
-
 	public CardVO getCardVO() {
 		return cardVO;
 	}
@@ -336,6 +334,12 @@ public class Avatar implements GameObj {
         if(avatarVO.getPaiArray()[0][cardIndex]>0) {
             avatarVO.getPaiArray()[0][cardIndex]--;
         }
+    }
+    
+    public void pullCardFormList(int[] cardList) {
+    	for(int i = 0; i < cardList.length; i++) {
+    		pullCardFormList(cardList[i]);
+    	}
     }
 
     /**

@@ -22,7 +22,6 @@ import com.dyz.gameserver.msg.response.shuaijiuyao.StartShuaiJiuYaoResponse;
 import com.dyz.gameserver.msg.response.startgame.PrepareGameResponse;
 import com.dyz.gameserver.msg.response.startgame.StartGameResponse;
 import com.dyz.gameserver.msg.response.xiazui.StartXiaZuiResponse;
-import com.dyz.gameserver.msg.response.xiazui.XiaZuiResponse;
 import com.dyz.gameserver.pojo.AvatarVO;
 import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.HuReturnObjectVO;
@@ -430,7 +429,8 @@ public class RoomLogic {
     }
     
     public void SetShuaiJiuYao(Avatar avatar, ShuaiJiuYaoVO shuaijiuyaoVO) {
-    	System.out.print("   SetShuaiJiuYao  " + shuaijiuyaoVO.getCardList());
+    	System.out.print(" //TODO  SetShuaiJiuYao  " + shuaijiuyaoVO.getCardList());
+    	avatar.pullCardFormList(shuaijiuyaoVO.getCardList());
 		for (Avatar itemAva : playerList) {
 			itemAva.getSession().sendMsg(new ShuaiJiuYaoResponse(1, shuaijiuyaoVO));
 		}

@@ -240,17 +240,22 @@ public class PlayCardsLogic {
 		}
 
 		int extraPai = 0;
-		if (roomVO.getRoomType() == 1 && roomVO.getGui() == 3) { //红中麻将额外加红中。
+		int rtype = roomVO.getRoomType();
+		if (rtype == 1 && roomVO.getGui() == 3) { //红中麻将额外加红中。
 			extraPai = 31;
-		} else if (roomVO.getRoomType() == 2 && roomVO.isAddWordCard()) {
+		} else if (rtype == 4) {//广东麻将
+			if(roomVO.isAddWordCard()) {
+				extraPai = 100;
+			} else if (roomVO.getGui() == 1) { //额外加白板鬼
+				extraPai = 33;
+			}
+		} else if (rtype == 5 || rtype == 7) { //默认全套。亳州麻将、甩九幺
 			extraPai = 100;
-		}else if (roomVO.getRoomType() == 4 && roomVO.isAddWordCard()) {
-			extraPai = 100;
-		}else if (roomVO.getRoomType() == 4 && roomVO.getGui() == 1) { //广东麻将额外加白板鬼
-			extraPai = 33;
-		}else if (roomVO.getRoomType() == 5) { //亳州麻将默认全套
-			extraPai = 100;
-		}
+		} else if (rtype == 2 || rtype == 6 || rtype == 8) { //开关控制全套。划水、金昌、推倒胡
+			if(roomVO.isAddWordCard()) {
+				extraPai = 100;
+			}
+		} 
 
 		int paiCount = 27;
 		if(extraPai != 0) {
@@ -281,12 +286,12 @@ public class PlayCardsLogic {
 	 * 产生鬼牌
 	 */
 	public void initGui(RoomVO value) {
-		if(value.getRoomType()==3){
+		if(value.getRoomType() == 1){
 			if(value.getGui() == 3)
-				perGui=31; //红中做鬼
-		}else if(value.getRoomType()==4){
-			if(value.getGui()==1)//白板做鬼
-				perGui=33;
+				perGui = 31; //红中做鬼
+		} else if(value.getRoomType() == 4){
+			if(value.getGui() == 1)//白板做鬼
+				perGui = 33;
 			else if(value.getGui()==2){//翻鬼
 				int ran = listCard.size() - nextCardindex + 1;
 				int ran2 = (int) (Math.random() * ran);
@@ -1555,15 +1560,6 @@ public class PlayCardsLogic {
 		return -1;
 	}
 
-	private void checkQiShouFu() {
-		for (int i = 0; i < playerList.size(); i++) {
-			// 判断是否有起手胡，有则加入到集合里面
-			if (qiShouFu(playerList.get(i))) {
-				qishouHuAvatar.add(playerList.get(i));
-			}
-		}
-	}
-
 	/**
 	 * 是否是起手胡
 	 * 
@@ -1658,12 +1654,21 @@ public class PlayCardsLogic {
 			return checkHuHShui(avatar, cardIndex);
 		} else if (roomVO.getRoomType() == 3){
 			// 长沙麻将
-			return checkHuChangsha(avatar);
+			return false;
 		}else if (roomVO.getRoomType() == 4) {
 			// 广东麻将
 			return checkHuGuangDong(avatar);
 		}else if (roomVO.getRoomType() == 5) {
 			// 亳州麻将
+			return checkHuBoZhou(avatar);
+		}else if (roomVO.getRoomType() == 6) {
+			// 金昌麻将
+			return checkHuBoZhou(avatar);
+		}else if (roomVO.getRoomType() == 7) {
+			// 甩九幺
+			return checkHuBoZhou(avatar);
+		}else if (roomVO.getRoomType() == 8) {
+			// 推倒胡
 			return checkHuBoZhou(avatar);
 		}
 		
@@ -1777,25 +1782,10 @@ public class PlayCardsLogic {
 
 	}
 
-	/**
-	 * 判断长沙麻将是否胡牌
-	 * 
-	 * @param avatar
-	 * @return
-	 */
-	public boolean checkHuChangsha(Avatar avatar) {
-		if (roomVO.getRoomType() == 3) {
-			// 判读有没有起手胡
-			checkQiShouFu();
-		}
-		return false;
-	}
-
 	public boolean checkHuBoZhou(Avatar avatar) {
 		int[][] paiList = avatar.getPaiArray();
 		
-		//System.out.println("   wxd>>>  check hu bozhou  " + roomVO.getQueYiMen());
-		if (true) {//roomVO.getQueYiMen()) { //缺一门 //TODO
+		if (roomVO.getBozhouHu() == 2) {
 			boolean tmpcheckQueYiMen = HuPaiType.CheckHuTypeQueYiMen(paiList);
 			if (!tmpcheckQueYiMen) // 缺一门
 			{
