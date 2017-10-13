@@ -29,7 +29,7 @@
 				<property name="url"
 					value="jdbc:mysql://localhost:3306/roledata?zeroDateTimeBehavior=convertToNull" />
 				<property name="username" value="root" />
-				<property name="password" value="X94UJ87UvZ8k" />
+				<property name="password" value="djd1w5cj" />
 			</dataSource>
 		</environment>
 	</environments>
