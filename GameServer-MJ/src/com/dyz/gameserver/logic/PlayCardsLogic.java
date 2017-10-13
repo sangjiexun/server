@@ -441,7 +441,7 @@ public class PlayCardsLogic {
 	public void pickCardAfterGang(Avatar avatar) {
 
 		// 本次摸得牌点数，下一张牌的点数，及本次摸的牌点数
-		int tempPoint = getNextCardPoint();
+		int tempPoint = getGangCardPoint();
 		currentCardPoint = tempPoint;
 		// System.out.println("摸牌!--"+tempPoint);
 		if (tempPoint != -1) {
@@ -1538,6 +1538,20 @@ public class PlayCardsLogic {
 		nextCardindex++;
 		if (nextCardindex < listCard.size()) {
 			return listCard.get(nextCardindex);
+		}
+		return -1;
+	}
+
+	/**
+	 * 获取杠后拿的下一张牌的点数,如果返回为-1 ，则没有牌了
+	 * 
+	 * @return
+	 */
+	public int getGangCardPoint() {
+		if (nextCardindex < listCard.size()) {
+			int card = listCard.get(listCard.size() - 1);
+			listCard.remove(listCard.size() - 1);
+			return card;
 		}
 		return -1;
 	}
