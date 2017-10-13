@@ -1,12 +1,9 @@
-package com.dyz.gameserver.msg.response.xiazui;
+package com.dyz.gameserver.msg.response.shuaijiuyao;
 
 import com.context.ConnectAPI;
 import com.dyz.gameserver.commons.message.ServerResponse;
-import com.dyz.gameserver.pojo.XiaZuiVO;
+import com.dyz.gameserver.pojo.ShuaiJiuYaoVO;
 import com.dyz.persist.util.JsonUtilTool;
-
-import net.sf.json.JSONObject;
-
 import java.io.IOException;
 
 /**
@@ -14,17 +11,17 @@ import java.io.IOException;
  * @author wuislet
  *
  */
-public class XiaZuiResponse extends ServerResponse {
+public class ShuaiJiuYaoResponse extends ServerResponse {
     /**
      * 必须调用此方法设置消息号
      *
      * @param status
      * @param
      */
-    public XiaZuiResponse(int status, XiaZuiVO xiazuiVO) {
-        super(status, ConnectAPI.XIAZUI_RESPONSE);
+    public ShuaiJiuYaoResponse(int status, ShuaiJiuYaoVO shuaijiuyaoVO) {
+        super(status, ConnectAPI.SHUAIJIUYAO_RESPONSE);
         try {
-            output.writeUTF(JsonUtilTool.toJson(xiazuiVO));
+            output.writeUTF(JsonUtilTool.toJson(shuaijiuyaoVO));
         } catch (IOException e) {
             e.printStackTrace();
         }

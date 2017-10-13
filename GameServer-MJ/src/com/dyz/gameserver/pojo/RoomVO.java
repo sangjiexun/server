@@ -106,12 +106,17 @@ public class RoomVO {
      */
     private boolean addWordCard;
     /**
-     *是否自摸胡，还是可以抢杠胡
-     *0: 可抢杠胡(默认); 1: 自摸胡; 2: 自摸 + 抢杠胡
+     * 胡法的限制
+     * 0：可以点炮；1：只能自摸；2：自摸 + 抢杠胡
      */
     private int huXianzhi;
     /**
-     *七小对
+     * 听牌规则
+     * 0：不特别限制，不显示文字；1：必须听牌；2：允许听牌行为；3：不允许听牌
+     */
+    private int listenType;
+    /**
+     * 七小对
      */
     private boolean sevenDouble;
     /**
@@ -123,47 +128,65 @@ public class RoomVO {
      */
     private int guiPai;
 
+    //划水麻将专属规则
     /**
      * 下鱼(漂)(0--10)
      */
     private int xiaYu;
     
+    //广东麻将专属规则
     /**
      *抓码的个数
      */
     private int ma;
     
+    //亳州麻将专属规则
     /**
      * 1.推倒胡 2.断一门
      */
     private int bozhouHu;
-
 	/**
      * 1.不下嘴 2.下嘴
      */
     private int xiazui;
-    
     /**
      * 不报听可胡
      */
     private boolean nolisterToBeard;
-
     /**
      * 暗杠亮
      */
     private boolean angangLiang;
-
     /**
      * 亳州麻将自摸倍数
      */
     private int bozhouZimoMagnification;
+    
+    //金昌麻将专属规则
+    /**
+     * 0x1：清一色  0x10：一条龙
+     */
+    private int OneAndOneColorTrain;
+    /**
+     * 报听
+     */
+    private boolean ReadyHand;
+    /**
+     * 底分
+     * 1：1分   2：2分   3：5分    4：10分
+     */
+    private int BottomScore;
+    /**
+     * 甩九幺
+     * 1：自摸   2：收炮（不算胡）
+     */
+    private int SJYHu;
     
     /**
      * 整个房间对应的所有人的牌组
      */
     private List<AvatarVO> playerList;
     
-
     
 	public int getRoomId() {
         return roomId;
@@ -200,12 +223,19 @@ public class RoomVO {
         this.addWordCard = addWordCard;
     }
     
-    public int getZiMo() {
+    public int getHuXianZhi() {
         return huXianzhi;
     }
-    public void setZiMo(int huXianzhi) {
+    public void setHuXianZhi(int huXianzhi) {
         this.huXianzhi = huXianzhi;
     }
+    
+	public int getListenType() {
+		return listenType;
+	}
+	public void setListenType(int listenType) {
+		this.listenType = listenType;
+	}
     
     public boolean getSevenDouble() {
         return sevenDouble;
@@ -283,6 +313,34 @@ public class RoomVO {
 	public void setBozhouZimoMagnification(int bozhouZimoMagnification) {
 		this.bozhouZimoMagnification = bozhouZimoMagnification;
 	}
+	
+	public int getOneAndOneColorTrain() {
+		return OneAndOneColorTrain;
+	}
+	public void setOneAndOneColorTrain(int oneAndOneColorTrain) {
+		OneAndOneColorTrain = oneAndOneColorTrain;
+	}
+
+	public boolean isReadyHand() {
+		return ReadyHand;
+	}
+	public void setReadyHand(boolean readyHand) {
+		ReadyHand = readyHand;
+	}
+
+	public int getBottomScore() {
+		return BottomScore;
+	}
+	public void setBottomScore(int bottomScore) {
+		BottomScore = bottomScore;
+	}
+
+	public int getSJYHu() {
+		return SJYHu;
+	}
+	public void setSJYHu(int sJYHu) {
+		SJYHu = sJYHu;
+	}
 
     public List<AvatarVO> getPlayerList() {
         return playerList;
@@ -305,6 +363,7 @@ public class RoomVO {
 
         result.addWordCard = addWordCard;
         result.huXianzhi = huXianzhi;
+        result.listenType = listenType;
         result.sevenDouble = sevenDouble;
         result.gui = gui;
         result.guiPai = guiPai;
@@ -318,6 +377,11 @@ public class RoomVO {
         result.nolisterToBeard = nolisterToBeard;
         result.angangLiang = angangLiang;
         result.bozhouZimoMagnification = bozhouZimoMagnification;
+        
+        result.OneAndOneColorTrain = OneAndOneColorTrain;
+        result.ReadyHand = ReadyHand;
+        result.BottomScore = BottomScore;
+        result.SJYHu = SJYHu;
         
         result.playerList = playerList;
         return result;

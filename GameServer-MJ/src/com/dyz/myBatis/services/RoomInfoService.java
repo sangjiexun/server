@@ -37,7 +37,7 @@ public class RoomInfoService {
 	        room.setRoomid(roomVO.getRoomId());
 	        room.setSevendouble(roomVO.getSevenDouble()?"1":"0");;
 	        room.setXiayu(roomVO.getXiaYu());
-	        room.setZimo(roomVO.getZiMo()==0?"0":"1");
+	        room.setZimo(roomVO.getHuXianZhi()==0?"0":"1");
 	        room.setName(roomVO.getName());
 	        room.setAddwordcard(roomVO.isAddWordCard()?"1":"0");
 	        room.setCreateTime(new Date());

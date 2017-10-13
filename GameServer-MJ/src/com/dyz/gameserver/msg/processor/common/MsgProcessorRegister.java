@@ -29,6 +29,7 @@ import com.dyz.gameserver.msg.processor.standings.StandingsMsgProcessor;
 import com.dyz.gameserver.msg.processor.standings.StandingsMsgProcessorSearch;
 import com.dyz.gameserver.msg.processor.startgame.PrepareGameMSGProcessor;
 import com.dyz.gameserver.msg.processor.xiazui.XiaZuiMsgProcessor;
+import com.dyz.gameserver.msg.processor.shuaijiuyao.ShuaiJiuYaoMsgProcessor;
 
 
 /**
@@ -55,6 +56,8 @@ public enum MsgProcessorRegister {
 	chuPai(ConnectAPI.CHUPAI_REQUEST,new ChuPaiMsgProcessor()),
 	/**下嘴*/
 	xiazui(ConnectAPI.XIAZUI_REQUEST,new XiaZuiMsgProcessor()),
+	/**甩九幺*/
+	shuaijiuyao(ConnectAPI.SHUAIJIUYAO_REQUEST,new ShuaiJiuYaoMsgProcessor()),
 	/**退出房间*/
 	outRoom(ConnectAPI.OUT_ROOM_REQUEST,new OutRoomMsgProcessor()),
 	/**申请解散房间*/

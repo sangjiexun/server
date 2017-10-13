@@ -678,7 +678,7 @@ public class PlayCardsLogic {
 		}
 		System.out.println("   wxd>>>  start  play card  " + putOffCardPoint);
 		// 房间为可点炮。房间为可抢杠胡并且有癞子时才检测其他玩家有没胡的情况。
-		boolean canDianPao = (avatar.getRoomVO().getZiMo() == 0 && avatar.getRoomVO().getGui() != 3 && avatar.getRoomVO().getRoomType()!=4);
+		boolean canDianPao = (avatar.getRoomVO().getHuXianZhi() == 0 && avatar.getRoomVO().getGui() != 3 && avatar.getRoomVO().getRoomType()!=4);
 		canDianPao = true; //TODEL
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < playerList.size(); i++) {
@@ -880,8 +880,8 @@ public class PlayCardsLogic {
 						String strs = avatar.getResultRelation().get(1);
 						if (strs != null && strs.contains(cardPoint + "")) { //碰牌自摸明杠（划水麻将里面的过路杠）
 							// 抢杠提前退出
-							if ((avatar.getRoomVO().getRoomType() != 4 && avatar.getRoomVO().getZiMo() == 0 && checkQiangHu(avatar, cardPoint))
-									|| (avatar.getRoomVO().getRoomType() == 4 && avatar.getRoomVO().getZiMo() == 2 && checkQiangHu(avatar, cardPoint))
+							if ((avatar.getRoomVO().getRoomType() != 4 && avatar.getRoomVO().getHuXianZhi() == 0 && checkQiangHu(avatar, cardPoint))
+									|| (avatar.getRoomVO().getRoomType() == 4 && avatar.getRoomVO().getHuXianZhi() == 2 && checkQiangHu(avatar, cardPoint))
 									) {
 								// 如果是抢杠胡，则判断其他玩家有胡牌的情况，有则给予提示 //判断其他三家是否能抢杠胡。
 								// 如果抢胡了，则更新上家出牌的点数为 杠的牌
@@ -1001,7 +1001,6 @@ public class PlayCardsLogic {
 		StringBuffer sb = new StringBuffer();
 		avatar.setCardListStatus(cardIndex, 3);
 		
-
 		for (Avatar itemAva : playerList) {
 			itemAva.getSession().sendMsg(new XiaZuiResponse(1, avatar.xiazuiVO));
 		}

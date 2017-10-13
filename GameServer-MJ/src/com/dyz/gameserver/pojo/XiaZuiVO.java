@@ -1,7 +1,7 @@
 package com.dyz.gameserver.pojo;
 
 /**
- * Created by wxd on 2017/9/14.
+ * Created by wuislet on 2017/9/14.
  */
 public class XiaZuiVO {
     /**

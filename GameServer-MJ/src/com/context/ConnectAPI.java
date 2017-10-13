@@ -81,6 +81,10 @@ public class ConnectAPI {
 	public static int START_XIAZUI_RESPONSE = 0x107778;  // 亳州麻将开始下嘴通知
 	public static int XIAZUI_RESPONSE = 0x107779;  // 亳州麻将下嘴通知
 	
+	public static int SHUAIJIUYAO_REQUEST = 0x108887; // 甩九幺麻将扔牌请求
+    public static int START_SHUAIJIUYAO_RESPONSE = 0x10888;  // 甩九幺麻将开始扔牌通知
+    public static int SHUAIJIUYAO_RESPONSE = 0x108889;  // 甩九幺麻将扔牌通知
+	
 	//游戏错误码返回
 	public static int ERROR_RESPONSE = 0xffff09;
 	

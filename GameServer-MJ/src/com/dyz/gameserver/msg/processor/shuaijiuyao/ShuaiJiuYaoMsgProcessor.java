@@ -1,4 +1,4 @@
-package com.dyz.gameserver.msg.processor.xiazui;
+package com.dyz.gameserver.msg.processor.shuaijiuyao;
 
 import com.context.ErrorCode;
 import com.dyz.gameserver.Avatar;
@@ -10,7 +10,7 @@ import com.dyz.gameserver.msg.processor.common.INotAuthProcessor;
 import com.dyz.gameserver.msg.processor.common.MsgProcessor;
 import com.dyz.gameserver.msg.response.ErrorResponse;
 import com.dyz.gameserver.pojo.RoomVO;
-import com.dyz.gameserver.pojo.XiaZuiVO;
+import com.dyz.gameserver.pojo.ShuaiJiuYaoVO;
 import com.dyz.persist.util.JsonUtilTool;
 
 /**
@@ -18,21 +18,21 @@ import com.dyz.persist.util.JsonUtilTool;
  * @author wuislet
  *
  */
-public class XiaZuiMsgProcessor extends MsgProcessor implements
+public class ShuaiJiuYaoMsgProcessor extends MsgProcessor implements
 		INotAuthProcessor {
 
-	public XiaZuiMsgProcessor() {
+	public ShuaiJiuYaoMsgProcessor() {
 	}
 
 	@Override
 	public void process(GameSession gameSession, ClientRequest request) throws Exception {
-        XiaZuiVO xiazuiVO = JsonUtilTool.fromJson(request.getString(), XiaZuiVO.class);
+		ShuaiJiuYaoVO shuaijiuyaoVO = JsonUtilTool.fromJson(request.getString(), ShuaiJiuYaoVO.class);
 		RoomVO roomVo = gameSession.getRole(Avatar.class).getRoomVO();
 		if(roomVo != null ){
 			RoomLogic roomLogic = RoomManager.getInstance().getRoom(roomVo.getRoomId());
 			if(roomLogic != null){
 				Avatar avatar = gameSession.getRole(Avatar.class);
-				roomLogic.SetXiaZui(avatar, xiazuiVO);
+				roomLogic.SetShuaiJiuYao(avatar, shuaijiuyaoVO);
 			}else{
 				gameSession.sendMsg(new ErrorResponse(ErrorCode.Error_000023));
 			}

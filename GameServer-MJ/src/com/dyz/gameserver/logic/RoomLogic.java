@@ -17,6 +17,8 @@ import com.dyz.gameserver.msg.response.login.BackLoginResponse;
 import com.dyz.gameserver.msg.response.login.OtherBackLoginResonse;
 import com.dyz.gameserver.msg.response.outroom.DissolveRoomResponse;
 import com.dyz.gameserver.msg.response.outroom.OutRoomResponse;
+import com.dyz.gameserver.msg.response.shuaijiuyao.ShuaiJiuYaoResponse;
+import com.dyz.gameserver.msg.response.shuaijiuyao.StartShuaiJiuYaoResponse;
 import com.dyz.gameserver.msg.response.startgame.PrepareGameResponse;
 import com.dyz.gameserver.msg.response.startgame.StartGameResponse;
 import com.dyz.gameserver.msg.response.xiazui.StartXiaZuiResponse;
@@ -26,6 +28,7 @@ import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.HuReturnObjectVO;
 import com.dyz.gameserver.pojo.ReadyVO;
 import com.dyz.gameserver.pojo.RoomVO;
+import com.dyz.gameserver.pojo.ShuaiJiuYaoVO;
 import com.dyz.gameserver.pojo.XiaZuiVO;
 import com.dyz.myBatis.model.Account;
 import com.dyz.myBatis.services.AccountService;
@@ -318,6 +321,15 @@ public class RoomLogic {
 				startGameRound(readyPhase);
 				readyPhase += 1;
 			}
+		} else if (readyPhase == 2) {
+			if (roomVO.getRoomType() == 7) {//甩九幺阶段
+				for (Avatar ava: playerList) {
+					ava.getSession().sendMsg(new StartShuaiJiuYaoResponse(1));
+				}
+			} else {//跳过下嘴阶段
+				startGameRound(readyPhase);
+				readyPhase += 1;
+			}
 		}
 		
 		if(readyPhase > finalPhase) { //阶段结束后重置
@@ -397,6 +409,8 @@ public class RoomLogic {
 	        	    avatar.avatarVO.getAccount().setIsGame("1");
 	            }
 	        }
+    	} else if(phase == 2) {
+    		
     	}
     }
     
@@ -413,6 +427,13 @@ public class RoomLogic {
     	avatar.extraScoreMultiple = xiazuiVO.getXiazuiMultiple();
     	
     	avatar.xiazuiVO = xiazuiVO;
+    }
+    
+    public void SetShuaiJiuYao(Avatar avatar, ShuaiJiuYaoVO shuaijiuyaoVO) {
+    	System.out.print("   SetShuaiJiuYao  " + shuaijiuyaoVO.getCardList());
+		for (Avatar itemAva : playerList) {
+			itemAva.getSession().sendMsg(new ShuaiJiuYaoResponse(1, shuaijiuyaoVO));
+		}
     }
     
     /**
