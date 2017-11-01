@@ -27,7 +27,7 @@ import com.dyz.gameserver.pojo.CardVO;
 import com.dyz.gameserver.pojo.HuReturnObjectVO;
 import com.dyz.gameserver.pojo.ReadyVO;
 import com.dyz.gameserver.pojo.RoomVO;
-import com.dyz.gameserver.pojo.ShuaiJiuYaoVO;
+import com.dyz.gameserver.pojo.CardListVO;
 import com.dyz.gameserver.pojo.XiaZuiVO;
 import com.dyz.myBatis.model.Account;
 import com.dyz.myBatis.services.AccountService;
@@ -68,7 +68,7 @@ public class RoomLogic {
     /**
      * 最终的阶段号
      */
-    private int finalPhase = 1;
+    private int finalPhase = 2;
   //战绩存取每一局的id
   	List<Integer> standingsDetailsIds = new ArrayList<Integer>();
     /**
@@ -301,7 +301,7 @@ public class RoomLogic {
     	}
     	
 		for (Avatar avatar : playerList) {
-			if(!avatar.avatarVO.getSingleIsReady(phase)){
+			if(!avatar.avatarVO.checkSingleIsReady(phase)){
 				return false;
 			}
 		}
@@ -311,30 +311,33 @@ public class RoomLogic {
     private void EnterNextPhase() {
 		startGameRound(readyPhase);
 		readyPhase += 1;
+    	System.out.println("    wxd>>>  EnterNextPhase" + readyPhase + " roomtype " + roomVO.getRoomType());
 		if (readyPhase == 1) {
 			if (roomVO.getXiazui() == 0 && roomVO.getRoomType() == 5) {//下嘴阶段
 				for (Avatar ava: playerList) {
 					ava.getSession().sendMsg(new StartXiaZuiResponse(1));
 				}
 			} else {//跳过下嘴阶段
-				startGameRound(readyPhase);
-				readyPhase += 1;
+		    	System.out.println("    wxd>>>  skip " + readyPhase);
+				EnterNextPhase();
+				return;
 			}
 		} else if (readyPhase == 2) {
 			if (roomVO.getRoomType() == 7) {//甩九幺阶段
 				for (Avatar ava: playerList) {
 					ava.getSession().sendMsg(new StartShuaiJiuYaoResponse(1));
 				}
-			} else {//跳过下嘴阶段
-				startGameRound(readyPhase);
-				readyPhase += 1;
+			} else {//跳过甩九幺阶段
+		    	System.out.println("    wxd>>>  skip " + readyPhase);
+				EnterNextPhase();
+				return;
 			}
 		}
 		
 		if(readyPhase > finalPhase) { //阶段结束后重置
-	        readyPhase = 0;
+	        readyPhase = 0; 
 	        for(int i = 0;i < playerList.size(); i++){
-	        	playerList.get(i).avatarVO.setAllIsReady(false);
+	        	playerList.get(i).avatarVO.coverAllIsReady(false);
 	        }
 		}
     }
@@ -350,18 +353,19 @@ public class RoomLogic {
 			}
 			return;
 		}
+		System.out.println("  check phase " + readyVO.getPhase() + "!=" + readyPhase);
 		if(readyVO.getPhase() != readyPhase) { //接到错误的阶段准备包。
 			return;
 		}
 		
-		avatar.avatarVO.setSingleIsReady(true, readyPhase);
+		avatar.avatarVO.SingleIsReady(true, readyPhase);
 		int avatarIndex = playerList.indexOf(avatar);
 		//成功则返回
 		for (Avatar ava : playerList) {
 			ava.getSession().sendMsg(new PrepareGameResponse(1, avatarIndex, readyPhase));
 		}
 		System.out.println("   wxd>>>  readygame  p " + readyPhase +
-				" ? " + CheckPhaseAllReady(readyPhase) + " f? " +roomVO.getXiazui());
+				" ? " + CheckPhaseAllReady(readyPhase) + " vop? " + readyVO.getPhase());
 		if(CheckPhaseAllReady(readyPhase)) {
 			EnterNextPhase();
 		}
@@ -371,8 +375,8 @@ public class RoomLogic {
      * @param phase 1-全体准备，开始游戏 2-发牌前一刻
      */
     private void startGameRound(int phase){
+    	System.out.println("    wxd>>>  start Game Round" + phase);
     	if(phase == 0) { //0-全体准备，开始游戏
-	    	System.out.println("    wxd>>>  start Game Round" + count);
 	        assert(count > 0);
 	        count--;
 	        roomVO.setCurrentRound(roomVO.getCurrentRound() +1);
@@ -428,11 +432,12 @@ public class RoomLogic {
     	avatar.xiazuiVO = xiazuiVO;
     }
     
-    public void SetShuaiJiuYao(Avatar avatar, ShuaiJiuYaoVO shuaijiuyaoVO) {
-    	System.out.print(" //TODO  SetShuaiJiuYao  " + shuaijiuyaoVO.getCardList());
-    	avatar.pullCardFormList(shuaijiuyaoVO.getCardList());
+    public void SetShuaiJiuYao(Avatar avatar, CardListVO cardlistVO) {
+    	System.out.println("  SetShuaiJiuYao  " + cardlistVO.getCardList().length + " from " + playerList.indexOf(avatar));
+    	avatar.pullCardFormList(cardlistVO.getCardList());
+    	cardlistVO.setAvatarIndex(playerList.indexOf(avatar));
 		for (Avatar itemAva : playerList) {
-			itemAva.getSession().sendMsg(new ShuaiJiuYaoResponse(1, shuaijiuyaoVO));
+			itemAva.getSession().sendMsg(new ShuaiJiuYaoResponse(1, cardlistVO));
 		}
     }
     
@@ -499,7 +504,7 @@ public class RoomLogic {
 	public void LoginReturnInfo(Avatar avatar){
 		playCardsLogic.LoginReturnInfo(avatar);
 	}
-	
+
 	
 	/**
 	 * 解散房间，销毁房间逻辑,打牌逻辑

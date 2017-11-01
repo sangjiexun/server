@@ -263,8 +263,7 @@ public class Avatar implements GameObj {
     	gangIndex.clear();//先清除缓存里面的可以杠的牌下标
     	//剔除掉当前以前吃，碰，杠的牌组 再进行比较
     	boolean flag = false;
-		int cardCnt = roomVO.isAddWordCard()?34:27;
-		for (int i = 0; i < cardCnt; i++) {
+		for (int i = 0; i < avatarVO.getPaiArray()[0].length; i++) {
 			if (avatarVO.getPaiArray()[0][i] == 4 && avatarVO.getPaiArray()[1][i] != 2) {
 				gangIndex.add(i);
 				flag = true;

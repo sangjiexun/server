@@ -1,4 +1,4 @@
-package com.dyz.gameserver.msg.response.shuaijiuyao;
+package com.dyz.gameserver.msg.response.throwcard;
 
 import com.context.ConnectAPI;
 import com.dyz.gameserver.commons.message.ServerResponse;
@@ -11,15 +11,15 @@ import java.io.IOException;
  * @author wuislet
  *
  */
-public class ShuaiJiuYaoResponse extends ServerResponse {
+public class ThrowCardResponse extends ServerResponse {
     /**
      * 必须调用此方法设置消息号
      *
      * @param status
      * @param
      */
-    public ShuaiJiuYaoResponse(int status, CardListVO cardlistVO) {
-        super(status, ConnectAPI.SHUAIJIUYAO_RESPONSE);
+    public ThrowCardResponse(int status, CardListVO cardlistVO) {
+        super(status, ConnectAPI.THROW_CARD_RESPONSE);
         try {
             output.writeUTF(JsonUtilTool.toJson(cardlistVO));
         } catch (IOException e) {

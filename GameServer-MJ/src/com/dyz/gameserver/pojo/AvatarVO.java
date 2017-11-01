@@ -98,18 +98,18 @@ public class AvatarVO {
 		this.isReady = isReady;
 	}
 
-    public boolean getSingleIsReady(int phase) {
+    public boolean checkSingleIsReady(int phase) {
         return isReady[phase];
     }
 
-    public void setSingleIsReady(boolean ready, int phase) {
+    public void SingleIsReady(boolean ready, int phase) {
         isReady[phase] = ready;
     }
     
     /**
      * 重置所有ready状态。
      */
-    public void setAllIsReady(boolean ready) {
+    public void coverAllIsReady(boolean ready) {
     	for(int i = 0; i < isReady.length; i++) {
     		isReady[i] = ready;
     	}

@@ -47,6 +47,7 @@ public class JsonUtilTool {
      */
     @SuppressWarnings("unchecked")
     public static <T> T fromJson(String jsonString, Class<T> type) {
+    	System.out.println("   json   " + jsonString);
         JSONObject jsonObject = JSONObject.fromObject(jsonString);
         return (T) JSONObject.toBean(jsonObject, type);
     }

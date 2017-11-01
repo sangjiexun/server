@@ -11,6 +11,7 @@ import com.dyz.gameserver.msg.processor.common.MsgProcessor;
 import com.dyz.gameserver.msg.response.ErrorResponse;
 import com.dyz.gameserver.pojo.ReadyVO;
 import com.dyz.gameserver.pojo.RoomVO;
+import com.dyz.gameserver.pojo.CardListVO;
 import com.dyz.persist.util.JsonUtilTool;
 
 /**
@@ -26,13 +27,11 @@ public class PrepareGameMSGProcessor extends MsgProcessor implements
 
 	@Override
 	public void process(GameSession gameSession, ClientRequest request) throws Exception {
-		String a = request.getString();
-		System.out.println("  wxd>>>  get pahse " + a);
-        //ReadyVO readyVO = JsonUtilTool.fromJson(a, ReadyVO.class);
-        ReadyVO readyVO = new ReadyVO();
-		System.out.println("  wxd>>>  get pahse " + a.split(":")[1].split(",")[0]);
-        readyVO.setPhase(Integer.parseInt(a.split(":")[1].split(",")[0]));
+		String str = request.getString();
+		System.out.println("  wxd>>>  get pahse " + str);
         
+        ReadyVO readyVO = JsonUtilTool.fromJson(str, ReadyVO.class);
+		
 		RoomVO roomVo = gameSession.getRole(Avatar.class).getRoomVO();
 		if(roomVo != null ){
 			RoomLogic roomLogic = RoomManager.getInstance().getRoom(roomVo.getRoomId());

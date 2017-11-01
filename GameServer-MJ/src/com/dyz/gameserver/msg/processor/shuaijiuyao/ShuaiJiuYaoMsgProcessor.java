@@ -10,7 +10,7 @@ import com.dyz.gameserver.msg.processor.common.INotAuthProcessor;
 import com.dyz.gameserver.msg.processor.common.MsgProcessor;
 import com.dyz.gameserver.msg.response.ErrorResponse;
 import com.dyz.gameserver.pojo.RoomVO;
-import com.dyz.gameserver.pojo.ShuaiJiuYaoVO;
+import com.dyz.gameserver.pojo.CardListVO;
 import com.dyz.persist.util.JsonUtilTool;
 
 /**
@@ -26,13 +26,14 @@ public class ShuaiJiuYaoMsgProcessor extends MsgProcessor implements
 
 	@Override
 	public void process(GameSession gameSession, ClientRequest request) throws Exception {
-		ShuaiJiuYaoVO shuaijiuyaoVO = JsonUtilTool.fromJson(request.getString(), ShuaiJiuYaoVO.class);
+		String str = request.getString();
+		CardListVO cardlistVO = JsonUtilTool.fromJson(str, CardListVO.class);
 		RoomVO roomVo = gameSession.getRole(Avatar.class).getRoomVO();
 		if(roomVo != null ){
 			RoomLogic roomLogic = RoomManager.getInstance().getRoom(roomVo.getRoomId());
 			if(roomLogic != null){
 				Avatar avatar = gameSession.getRole(Avatar.class);
-				roomLogic.SetShuaiJiuYao(avatar, shuaijiuyaoVO);
+				roomLogic.SetShuaiJiuYao(avatar, cardlistVO);
 			}else{
 				gameSession.sendMsg(new ErrorResponse(ErrorCode.Error_000023));
 			}
